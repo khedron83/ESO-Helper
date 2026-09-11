@@ -1,18 +1,18 @@
 # Grimoire — dev notes
 
+> Grimoire no longer has its own repo (`khedron83/Grimoire` is being deleted). It's
+> vendored as plain files inside `khedron83/ESO-Helper` at `Grimoire/`. The tag/release
+> CI flow below is defunct — there's no `origin` for this subtree and
+> `.github/workflows/build.yml` won't run from the ESO-Helper repo.
+
 ## Version bumps
 
-When bumping the version, update **all three** of these:
+When bumping the version, update **both** of these:
 
 1. `pyproject.toml` — `version = "x.y.z"`
 2. `src/ui/workers.py` — `APP_VERSION = "x.y.z"`
-3. The About dialog in `src/ui/main_window.py` reads `APP_VERSION` automatically — no change needed there.
 
-After committing, tag and push:
-```bash
-git tag vX.Y.Z && git push origin master && git push origin vX.Y.Z
-```
-CI will build and publish the release automatically.
+The About dialog in `src/ui/main_window.py` reads `APP_VERSION` automatically.
 
 ## UI/UX review — 2026-07-09
 

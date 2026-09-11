@@ -14,12 +14,15 @@ imported, via `sys.path` pointing at both repo roots. This was a deliberate
 pivot from an earlier launcher-that-spawns-two-processes design — see git
 history if that shape is ever wanted back.
 
-`eso-build-manager/` and `Grimoire/` are still full copies of their original
-repos (no shared git history — those still live at their own GitHub
-remotes), and each is still independently runnable via its own
-`main.py`/`run.py` — this file doesn't touch their internals, only composes
-them. Fixes belonging to one app go in that app's directory and, ideally,
-back upstream to its own repo — not here.
+`eso-build-manager/` and `Grimoire/` began as copies of separate repos, but this
+whole tree (`~/Projects/eso-helper/`) is now a single git repo → `khedron83/ESO-Helper`
+(renamed from `ESO-Build-Manager`; history force-reset 2026-09-11). The old
+`ESO-Build-Manager` name redirects here. `Grimoire/` is vendored as plain files —
+its standalone repo `khedron83/Grimoire` is being deleted, so this is its only home
+now; `Grimoire/CLAUDE.md`'s `git tag && push` release flow no longer applies. Each
+sub-app is still independently runnable via its own `main.py`/`run.py`, and this
+file doesn't touch their internals, only composes them. Fixes belonging to one
+sub-app still go in that sub-app's directory.
 
 ## What the composition layer in `main.py` actually does
 
