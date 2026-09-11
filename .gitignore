@@ -22,5 +22,7 @@ build/
 
 # Personal ESO SavedVariables pulled from the game box -- a self-healing cache,
 # re-fetched on the next reload, never source. The WornGear/ addon *source*
-# (Lua under eso-build-manager/WornGear/) IS tracked; these top-level dumps are not.
-/eso-build-manager/*.lua
+# (Lua under viewer/WornGear/) IS tracked; these top-level dumps are not.
+# (viewer/.gitignore has the same rule scoped to its own directory -- this one
+# is just belt-and-suspenders redundancy at the root.)
+/viewer/*.lua
