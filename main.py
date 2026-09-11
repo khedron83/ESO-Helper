@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""ESO Helper — ESO Build Manager and Grimoire in one window, as tabs.
+"""ESO Helper — the character/loadout viewer and the addon manager in one window,
+as tabs.
 
 Both sub-apps' `MainWindow` classes are reused completely unmodified (imported
-straight from their own repos below) — this file is only a composition layer:
-one shared QApplication, one outer window, one tray icon, one single-instance
-lock. Neither sub-app's own entry point (main.py's `if __name__ == '__main__':`
-block / Grimoire's `main()`) ever runs, so their own app-creation/tray/single-
-instance code never executes — only their class definitions get imported.
+straight from their own vendored directories below) — this file is only a
+composition layer: one shared QApplication, one outer window, one tray icon,
+one single-instance lock. Neither sub-app's own entry point (viewer's `main.py`
+`if __name__ == '__main__':` block / addon manager's `main()`) ever runs, so
+their own app-creation/tray/single-instance code never executes — only their
+class definitions get imported.
 """
 import importlib.util
 import logging
@@ -14,8 +16,8 @@ import sys
 from pathlib import Path
 
 _DIR = Path(__file__).resolve().parent
-sys.path.insert(0, str(_DIR / "Grimoire"))
-sys.path.insert(0, str(_DIR / "eso-build-manager"))
+sys.path.insert(0, str(_DIR / "addon_manager"))
+sys.path.insert(0, str(_DIR / "viewer"))
 
 # Log to a file, not just stderr -- when launched from a desktop icon/tray
 # autostart (the normal way this app runs) there's no terminal to catch a
@@ -39,17 +41,17 @@ from PySide6.QtGui import QAction, QIcon
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtWidgets import QApplication, QMainWindow, QMenu, QSystemTrayIcon
 
-from eso_build_manager.app import create_app
-from src.ui.main_window import MainWindow as GrimoireWindow
+from eso_viewer.app import create_app
+from src.ui.main_window import MainWindow as AddonManagerWindow
 
 
 def _load_module(name: str, path: Path):
-    # eso-build-manager's entry point is also named main.py — a plain
-    # `import main` would collide with sys.modules depending on how *this*
-    # file was itself invoked/imported. Loading by explicit path sidesteps
-    # that regardless of invocation style. Its class defs only get imported
-    # this way — the `if __name__ == '__main__':` guard at the bottom of
-    # that file never runs, since this isn't executing it as __main__.
+    # viewer's entry point is also named main.py — a plain `import main` would
+    # collide with sys.modules depending on how *this* file was itself
+    # invoked/imported. Loading by explicit path sidesteps that regardless of
+    # invocation style. Its class defs only get imported this way — the
+    # `if __name__ == '__main__':` guard at the bottom of that file never
+    # runs, since this isn't executing it as __main__.
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[name] = module
@@ -57,10 +59,10 @@ def _load_module(name: str, path: Path):
     return module
 
 
-build_manager_main = _load_module("_eso_build_manager_main", _DIR / "eso-build-manager" / "main.py")
+viewer_main = _load_module("_eso_viewer_main", _DIR / "viewer" / "main.py")
 
 _SINGLE_INSTANCE_KEY = "eso-helper-single-instance"
-_TRAY_ICON_FILE = _DIR / "eso-build-manager" / "packaging" / "eso-build-manager.svg"
+_TRAY_ICON_FILE = _DIR / "packaging" / "eso-helper.svg"
 
 
 def _notify_running_instance() -> bool:
@@ -102,23 +104,23 @@ class ESOHelperWindow(QMainWindow):
         else:
             self.resize(1400, 900)
 
-        # Grimoire built first: build_win's own tab strip (Character/Activities/
-        # Storage/Collection) takes it as a 5th "Addons" tab via the extra_tab
-        # hook, rather than the two sub-apps sitting as two top-level tabs one
-        # level up -- one row of 5 peer tabs reads more like one app than a
-        # mode switch between two.
-        self._grimoire_win = GrimoireWindow()
-        self._build_win = build_manager_main.MainWindow(extra_tab=(self._grimoire_win, "Addons"))
+        # Addon manager built first: viewer_win's own tab strip (Character/
+        # Activities/Storage/Collection) takes it as a 5th "Addons" tab via the
+        # extra_tab hook, rather than the two sub-apps sitting as two
+        # top-level tabs one level up -- one row of 5 peer tabs reads more
+        # like one app than a mode switch between two.
+        self._addon_manager_win = AddonManagerWindow()
+        self._viewer_win = viewer_main.MainWindow(extra_tab=(self._addon_manager_win, "Addons"))
         # Each sub-app manages its own tray icon assuming it's a standalone
         # top-level window; embedded here that would mean two tray icons for
         # what's supposed to read as one app — hide both and give the merged
         # window a single tray icon below instead.
-        for sub in (self._build_win, self._grimoire_win):
+        for sub in (self._viewer_win, self._addon_manager_win):
             tray = getattr(sub, "_tray", None)
             if tray is not None:
                 tray.hide()
 
-        self.setCentralWidget(self._build_win)
+        self.setCentralWidget(self._viewer_win)
 
         self._setup_tray()
 
@@ -157,13 +159,15 @@ class ESOHelperWindow(QMainWindow):
 
 
 def main():
-    # eso_build_manager.app.create_app() sets applicationName="ESO Build Manager" /
-    # organizationName="CubicSerenity" and calls init_db() — deliberately left as-is
-    # (not renamed to "ESO Helper") since eso-build-manager's own code relies on bare
-    # QSettings() resolving to that exact org/app pair for its geometry/sync/dailies
-    # settings (see eso-build-manager/CLAUDE.md's "Storage" section) — renaming it
-    # here would silently break that, the same class of bug that CLAUDE.md already
-    # warns about once.
+    # eso_viewer.app.create_app() sets applicationName="ESO Helper Viewer" /
+    # organizationName="CubicSerenity" -- deliberately NOT "ESO Helper" (this outer
+    # window's own QSettings("CubicSerenity", "ESO Helper") above), even though the
+    # viewer's own code relies on bare QSettings() resolving off whatever name is
+    # set here for its geometry/sync/dailies settings. Using the exact same name as
+    # the outer window would mean both windows' bare/explicit QSettings resolve to
+    # the same file and fight over the same "geometry" key. create_app() migrates
+    # values from the pre-rename "ESO Build Manager" identity on first run under the
+    # new name -- see eso_viewer/app.py and viewer/CLAUDE.md's "Storage" section.
     app = create_app(sys.argv)
     app.setStyle("Fusion")
     if _notify_running_instance():

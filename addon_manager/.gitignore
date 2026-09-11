@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+
+# PyInstaller
+*.spec.bak
+
+# Flatpak build artifacts
+build-dir/
+.flatpak-builder/
+
+# Node / Tauri (an earlier, since-archived rewrite attempt)
+node_modules/
+src-tauri/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store

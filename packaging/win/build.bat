@@ -1,5 +1,5 @@
 @echo off
-REM Builds a Windows onedir package of ESO Helper (eso-build-manager + Grimoire).
+REM Builds a Windows onedir package of ESO Helper (viewer + addon_manager).
 REM Run this from anywhere, on the Windows machine ESO itself runs on -- PyInstaller
 REM does not cross-compile, so this can't be built from Linux/macOS for a Windows target.
 REM
@@ -16,8 +16,8 @@ if not exist .venv (
 call .venv\Scripts\activate.bat
 
 echo Installing dependencies...
-pip install -r eso-build-manager\requirements.txt
-pip install -r Grimoire\requirements.txt
+pip install -r viewer\requirements.txt
+pip install -r addon_manager\requirements.txt
 pip install pyinstaller
 
 echo Building...
