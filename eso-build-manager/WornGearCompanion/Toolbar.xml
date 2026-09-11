@@ -1,0 +1,37 @@
+<GuiXml>
+    <Controls>
+        <TopLevelControl name="WGCToolbar" mouseEnabled="true" movable="true" clampedToScreen="true">
+            <Dimensions x="380" y="30" />
+            <Anchor point="TOPLEFT" relativeTo="GuiRoot" relativePoint="TOPLEFT" offsetX="400" offsetY="8" />
+            <OnMoveStop>WGC.Toolbar_OnMoveStop(self)</OnMoveStop>
+            <Controls>
+                <Backdrop name="$(parent)Bg" inherits="ZO_DefaultBackdrop">
+                    <AnchorFill />
+                </Backdrop>
+
+                <Label name="$(parent)Bag" font="ZoFontGameSmall" verticalAlignment="CENTER" horizontalAlignment="LEFT">
+                    <Dimensions x="90" y="30" />
+                    <Anchor point="LEFT" offsetX="10" />
+                </Label>
+
+                <Label name="$(parent)Riding" font="ZoFontGameSmall" verticalAlignment="CENTER" horizontalAlignment="LEFT">
+                    <Dimensions x="110" y="30" />
+                    <Anchor point="LEFT" relativeTo="$(parent)Bag" relativePoint="RIGHT" offsetX="4" />
+                </Label>
+
+                <Label name="$(parent)Research" font="ZoFontGameSmall" verticalAlignment="CENTER" horizontalAlignment="LEFT">
+                    <Dimensions x="130" y="30" />
+                    <Anchor point="LEFT" relativeTo="$(parent)Riding" relativePoint="RIGHT" offsetX="4" />
+                </Label>
+
+                <Label name="$(parent)Warning" mouseEnabled="true" font="ZoFontGameBold" verticalAlignment="CENTER" horizontalAlignment="CENTER" hidden="true">
+                    <Dimensions x="30" y="30" />
+                    <Anchor point="RIGHT" offsetX="-4" />
+                    <OnMouseUp>WGC.Toolbar_OnWarningClicked(self)</OnMouseUp>
+                    <OnMouseEnter>WGC.Toolbar_OnWarningMouseEnter(self)</OnMouseEnter>
+                    <OnMouseExit>ZO_Tooltips_HideTextTooltip()</OnMouseExit>
+                </Label>
+            </Controls>
+        </TopLevelControl>
+    </Controls>
+</GuiXml>

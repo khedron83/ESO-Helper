@@ -1,0 +1,16 @@
+## Title: WornGear Companion
+## Description: Toolbar, daily checklist, and an in-game character dashboard built on WornGear's collected data.
+## Version: 1
+## APIVersion: 101048 101050
+## DependsOn: WornGear LibAddonMenu-2.0>=40
+## SavedVariables: WornGearCompanionSV
+
+Core.lua
+Toolbar.xml
+Toolbar.lua
+Checklist.xml
+Checklist.lua
+MainWindow.xml
+MainWindow.lua
+Alerts.lua
+Settings.lua

@@ -1,0 +1,2838 @@
+[
+  {
+    "id": 686,
+    "name": "Abyssal Brace"
+  },
+  {
+    "id": 700,
+    "name": "Adamant Lurker"
+  },
+  {
+    "id": 385,
+    "name": "Adept Rider"
+  },
+  {
+    "id": 475,
+    "name": "Aegis Caller"
+  },
+  {
+    "id": 388,
+    "name": "Aegis of Galenwe"
+  },
+  {
+    "id": 781,
+    "name": "Aerie's Cry"
+  },
+  {
+    "id": 541,
+    "name": "Aetherial Ascension"
+  },
+  {
+    "id": 780,
+    "name": "Aetheric Lancer"
+  },
+  {
+    "id": 101,
+    "name": "Affliction"
+  },
+  {
+    "id": 206,
+    "name": "Agility"
+  },
+  {
+    "id": 21,
+    "name": "Akaviri Dragonguard"
+  },
+  {
+    "id": 82,
+    "name": "Alessia's Bulwark"
+  },
+  {
+    "id": 39,
+    "name": "Alessian Order"
+  },
+  {
+    "id": 85,
+    "name": "Almalexia's Mercy"
+  },
+  {
+    "id": 258,
+    "name": "Amber Plasm"
+  },
+  {
+    "id": 469,
+    "name": "Ancient Dragonguard"
+  },
+  {
+    "id": 702,
+    "name": "Ansuul's Torment"
+  },
+  {
+    "id": 734,
+    "name": "Anthelmir's Construct"
+  },
+  {
+    "id": 685,
+    "name": "Apocryphal Inspiration"
+  },
+  {
+    "id": 666,
+    "name": "Archdruid Devyric"
+  },
+  {
+    "id": 23,
+    "name": "Archer's Mind"
+  },
+  {
+    "id": 518,
+    "name": "Arkasis's Genius"
+  },
+  {
+    "id": 802,
+    "name": "Arkay's Charity"
+  },
+  {
+    "id": 178,
+    "name": "Armor Master"
+  },
+  {
+    "id": 43,
+    "name": "Armor of the Seducer"
+  },
+  {
+    "id": 281,
+    "name": "Armor of the Trainee"
+  },
+  {
+    "id": 36,
+    "name": "Armor of the Veiled Heritance"
+  },
+  {
+    "id": 96,
+    "name": "Armor of Truth"
+  },
+  {
+    "id": 120,
+    "name": "Arms of Infernace"
+  },
+  {
+    "id": 389,
+    "name": "Arms of Relequen"
+  },
+  {
+    "id": 121,
+    "name": "Arms of the Ancestors"
+  },
+  {
+    "id": 54,
+    "name": "Ashen Grip"
+  },
+  {
+    "id": 260,
+    "name": "Aspect of Mazzatun"
+  },
+  {
+    "id": 323,
+    "name": "Assassin's Guile"
+  },
+  {
+    "id": 435,
+    "name": "Auroran's Thunder"
+  },
+  {
+    "id": 330,
+    "name": "Automated Defense"
+  },
+  {
+    "id": 759,
+    "name": "Ayleid Refuge"
+  },
+  {
+    "id": 456,
+    "name": "Azureblight Reaper"
+  },
+  {
+    "id": 756,
+    "name": "Baan Dar's Blessing"
+  },
+  {
+    "id": 671,
+    "name": "Back-Alley Gourmand"
+  },
+  {
+    "id": 227,
+    "name": "Bahraha's Curse"
+  },
+  {
+    "id": 587,
+    "name": "Bahsei's Mania"
+  },
+  {
+    "id": 397,
+    "name": "Balorgh"
+  },
+  {
+    "id": 473,
+    "name": "Bani's Torment"
+  },
+  {
+    "id": 829,
+    "name": "Bar-Sakka"
+  },
+  {
+    "id": 28,
+    "name": "Barkskin"
+  },
+  {
+    "id": 636,
+    "name": "Baron Thirsk"
+  },
+  {
+    "id": 578,
+    "name": "Baron Zaudrus"
+  },
+  {
+    "id": 723,
+    "name": "Basalt-Blooded Warrior"
+  },
+  {
+    "id": 673,
+    "name": "Bastion of the Draoife"
+  },
+  {
+    "id": 131,
+    "name": "Bastion of the Heartland"
+  },
+  {
+    "id": 422,
+    "name": "Battalion Defender"
+  },
+  {
+    "id": 419,
+    "name": "Battlefield Acrobat"
+  },
+  {
+    "id": 779,
+    "name": "Beacon of Oblivion"
+  },
+  {
+    "id": 52,
+    "name": "Beckoning Steel"
+  },
+  {
+    "id": 288,
+    "name": "Beekeeper's Gear"
+  },
+  {
+    "id": 626,
+    "name": "Belharza's Band"
+  },
+  {
+    "id": 137,
+    "name": "Berserking Warrior"
+  },
+  {
+    "id": 824,
+    "name": "Black Foundry Steel"
+  },
+  {
+    "id": 828,
+    "name": "Black Gem Monstrosity"
+  },
+  {
+    "id": 179,
+    "name": "Black Rose"
+  },
+  {
+    "id": 732,
+    "name": "Black-Glove Grounding"
+  },
+  {
+    "id": 804,
+    "name": "Blackfeather Flight"
+  },
+  {
+    "id": 643,
+    "name": "Blessing of High Isle"
+  },
+  {
+    "id": 128,
+    "name": "Blessing of the Potentates"
+  },
+  {
+    "id": 735,
+    "name": "Blind Path Induction"
+  },
+  {
+    "id": 400,
+    "name": "Blood Moon"
+  },
+  {
+    "id": 339,
+    "name": "Blooddrinker"
+  },
+  {
+    "id": 521,
+    "name": "Bloodlord's Embrace"
+  },
+  {
+    "id": 163,
+    "name": "Bloodspawn"
+  },
+  {
+    "id": 65,
+    "name": "Bloodthorn's Touch"
+  },
+  {
+    "id": 755,
+    "name": "Blunted Blades"
+  },
+  {
+    "id": 581,
+    "name": "Bog Raider"
+  },
+  {
+    "id": 308,
+    "name": "Bone Pirate's Tatters"
+  },
+  {
+    "id": 184,
+    "name": "Brands of Imperium"
+  },
+  {
+    "id": 212,
+    "name": "Briarheart"
+  },
+  {
+    "id": 405,
+    "name": "Bright-Throat's Boast"
+  },
+  {
+    "id": 381,
+    "name": "Broken Soul"
+  },
+  {
+    "id": 133,
+    "name": "Buffer of the Swift"
+  },
+  {
+    "id": 791,
+    "name": "Bulwark Ruination"
+  },
+  {
+    "id": 160,
+    "name": "Burning Spellweave"
+  },
+  {
+    "id": 442,
+    "name": "Call of the Undertaker"
+  },
+  {
+    "id": 343,
+    "name": "Caluurion's Legacy"
+  },
+  {
+    "id": 699,
+    "name": "Camonna Tong"
+  },
+  {
+    "id": 316,
+    "name": "Caustic Arrow"
+  },
+  {
+    "id": 407,
+    "name": "Champion of the Hist"
+  },
+  {
+    "id": 365,
+    "name": "Chaotic Whirlwind"
+  },
+  {
+    "id": 677,
+    "name": "Chimera's Rebuke"
+  },
+  {
+    "id": 269,
+    "name": "Chokethorn"
+  },
+  {
+    "id": 730,
+    "name": "Cinders of Anthelmir"
+  },
+  {
+    "id": 679,
+    "name": "Claw of the Forest Wraith"
+  },
+  {
+    "id": 446,
+    "name": "Claw of Yolnahkriin"
+  },
+  {
+    "id": 225,
+    "name": "Clever Alchemist"
+  },
+  {
+    "id": 437,
+    "name": "Coldharbour's Favorite"
+  },
+  {
+    "id": 711,
+    "name": "Colovian Highlands General"
+  },
+  {
+    "id": 194,
+    "name": "Combat Physician"
+  },
+  {
+    "id": 367,
+    "name": "Concentrated Force"
+  },
+  {
+    "id": 647,
+    "name": "Coral Riptide"
+  },
+  {
+    "id": 777,
+    "name": "Corpseburster"
+  },
+  {
+    "id": 831,
+    "name": "Coup De Grâce"
+  },
+  {
+    "id": 327,
+    "name": "Coward's Gear"
+  },
+  {
+    "id": 440,
+    "name": "Crafty Alfiq"
+  },
+  {
+    "id": 113,
+    "name": "Crest of Cyrodiil"
+  },
+  {
+    "id": 602,
+    "name": "Crimson Oath's Rive"
+  },
+  {
+    "id": 515,
+    "name": "Crimson Twilight"
+  },
+  {
+    "id": 480,
+    "name": "Critical Riposte"
+  },
+  {
+    "id": 371,
+    "name": "Cruel Flurry"
+  },
+  {
+    "id": 77,
+    "name": "Crusader"
+  },
+  {
+    "id": 373,
+    "name": "Crushing Wall"
+  },
+  {
+    "id": 691,
+    "name": "Cryptcanon Vestments"
+  },
+  {
+    "id": 104,
+    "name": "Curse Eater"
+  },
+  {
+    "id": 348,
+    "name": "Curse of Doylemish"
+  },
+  {
+    "id": 324,
+    "name": "Daedric Trickery"
+  },
+  {
+    "id": 573,
+    "name": "Dagon's Dominion"
+  },
+  {
+    "id": 468,
+    "name": "Daring Corsair"
+  },
+  {
+    "id": 616,
+    "name": "Dark Convergence"
+  },
+  {
+    "id": 60,
+    "name": "Darkstride"
+  },
+  {
+    "id": 482,
+    "name": "Dauntless Combatant"
+  },
+  {
+    "id": 406,
+    "name": "Dead-Water's Guile"
+  },
+  {
+    "id": 580,
+    "name": "Deadlands Assassin"
+  },
+  {
+    "id": 611,
+    "name": "Deadlands Demolisher"
+  },
+  {
+    "id": 127,
+    "name": "Deadly Strike"
+  },
+  {
+    "id": 596,
+    "name": "Death Dealer's Fete"
+  },
+  {
+    "id": 37,
+    "name": "Death's Wind"
+  },
+  {
+    "id": 806,
+    "name": "Death-Dancer"
+  },
+  {
+    "id": 660,
+    "name": "Deeproot Zeal"
+  },
+  {
+    "id": 138,
+    "name": "Defending Warrior"
+  },
+  {
+    "id": 364,
+    "name": "Defensive Position"
+  },
+  {
+    "id": 321,
+    "name": "Defiler"
+  },
+  {
+    "id": 25,
+    "name": "Desert Rose"
+  },
+  {
+    "id": 317,
+    "name": "Destructive Impact"
+  },
+  {
+    "id": 140,
+    "name": "Destructive Mage"
+  },
+  {
+    "id": 584,
+    "name": "Diamond's Victory"
+  },
+  {
+    "id": 363,
+    "name": "Disciplined Slash"
+  },
+  {
+    "id": 816,
+    "name": "Dolorous Arena"
+  },
+  {
+    "id": 342,
+    "name": "Domihaus"
+  },
+  {
+    "id": 655,
+    "name": "Dov-rha Sabatons"
+  },
+  {
+    "id": 491,
+    "name": "Dragon's Appetite"
+  },
+  {
+    "id": 457,
+    "name": "Dragon's Defilement"
+  },
+  {
+    "id": 467,
+    "name": "Dragonguard Elite"
+  },
+  {
+    "id": 571,
+    "name": "Drake's Rush"
+  },
+  {
+    "id": 307,
+    "name": "Draugr Hulk"
+  },
+  {
+    "id": 135,
+    "name": "Draugr's Heritage"
+  },
+  {
+    "id": 335,
+    "name": "Draugr's Rest"
+  },
+  {
+    "id": 474,
+    "name": "Draugrkin's Grip"
+  },
+  {
+    "id": 22,
+    "name": "Dreamer's Mantle"
+  },
+  {
+    "id": 61,
+    "name": "Dreugh King Slayer"
+  },
+  {
+    "id": 453,
+    "name": "Dro'Zakar's Claws"
+  },
+  {
+    "id": 642,
+    "name": "Druid's Braid"
+  },
+  {
+    "id": 102,
+    "name": "Duneripper's Scales"
+  },
+  {
+    "id": 71,
+    "name": "Durok's Bane"
+  },
+  {
+    "id": 130,
+    "name": "Eagle Eye"
+  },
+  {
+    "id": 341,
+    "name": "Earthgore"
+  },
+  {
+    "id": 122,
+    "name": "Ebon Armory"
+  },
+  {
+    "id": 516,
+    "name": "Elemental Catalyst"
+  },
+  {
+    "id": 215,
+    "name": "Elemental Succession"
+  },
+  {
+    "id": 83,
+    "name": "Elf Bane"
+  },
+  {
+    "id": 158,
+    "name": "Embershield"
+  },
+  {
+    "id": 577,
+    "name": "Encratis's Behemoth"
+  },
+  {
+    "id": 204,
+    "name": "Endurance"
+  },
+  {
+    "id": 631,
+    "name": "Enervating Aura"
+  },
+  {
+    "id": 166,
+    "name": "Engine Guardian"
+  },
+  {
+    "id": 692,
+    "name": "Esoteric Environment Greaves"
+  },
+  {
+    "id": 198,
+    "name": "Essence Thief"
+  },
+  {
+    "id": 226,
+    "name": "Eternal Hunt"
+  },
+  {
+    "id": 489,
+    "name": "Eternal Vigor"
+  },
+  {
+    "id": 171,
+    "name": "Eternal Warrior"
+  },
+  {
+    "id": 667,
+    "name": "Euphotic Gatekeeper"
+  },
+  {
+    "id": 557,
+    "name": "Executioner's Blade"
+  },
+  {
+    "id": 544,
+    "name": "Explosive Rebuke"
+  },
+  {
+    "id": 443,
+    "name": "Eye of Nahviintaas"
+  },
+  {
+    "id": 613,
+    "name": "Eye of the Grasp"
+  },
+  {
+    "id": 87,
+    "name": "Eyes of Mara"
+  },
+  {
+    "id": 444,
+    "name": "False God's Devotion"
+  },
+  {
+    "id": 792,
+    "name": "Farstrider"
+  },
+  {
+    "id": 238,
+    "name": "Fasalla's Guile"
+  },
+  {
+    "id": 674,
+    "name": "Faun's Lark Cladding"
+  },
+  {
+    "id": 810,
+    "name": "Fellowship's Fortitude"
+  },
+  {
+    "id": 27,
+    "name": "Fiord's Legacy"
+  },
+  {
+    "id": 338,
+    "name": "Flame Blossom"
+  },
+  {
+    "id": 244,
+    "name": "Flanking Strategist"
+  },
+  {
+    "id": 799,
+    "name": "Fledgling's Nest"
+  },
+  {
+    "id": 574,
+    "name": "Foolkiller's Ward"
+  },
+  {
+    "id": 24,
+    "name": "Footman's Fortune"
+  },
+  {
+    "id": 562,
+    "name": "Force Overflow"
+  },
+  {
+    "id": 352,
+    "name": "Fortified Brass"
+  },
+  {
+    "id": 559,
+    "name": "Frenzied Momentum"
+  },
+  {
+    "id": 579,
+    "name": "Frostbite"
+  },
+  {
+    "id": 433,
+    "name": "Frozen Watcher"
+  },
+  {
+    "id": 807,
+    "name": "Full Belly Barricade"
+  },
+  {
+    "id": 246,
+    "name": "Galerion's Revenge"
+  },
+  {
+    "id": 411,
+    "name": "Gallant Charge"
+  },
+  {
+    "id": 729,
+    "name": "Gardener of Seasons"
+  },
+  {
+    "id": 593,
+    "name": "Gaze of Sithis"
+  },
+  {
+    "id": 621,
+    "name": "Glacial Guardian"
+  },
+  {
+    "id": 849,
+    "name": "Glittering Goad"
+  },
+  {
+    "id": 600,
+    "name": "Glorgoloch the Destroyer"
+  },
+  {
+    "id": 213,
+    "name": "Glorious Defender"
+  },
+  {
+    "id": 855,
+    "name": "Gorethief"
+  },
+  {
+    "id": 261,
+    "name": "Gossamer"
+  },
+  {
+    "id": 382,
+    "name": "Grace of Gloom"
+  },
+  {
+    "id": 126,
+    "name": "Grace of the Ancients"
+  },
+  {
+    "id": 318,
+    "name": "Grand Rejuvenation"
+  },
+  {
+    "id": 476,
+    "name": "Grave Guardian"
+  },
+  {
+    "id": 664,
+    "name": "Grave Inevitability"
+  },
+  {
+    "id": 408,
+    "name": "Grave-Stake Collector"
+  },
+  {
+    "id": 287,
+    "name": "Green Pact"
+  },
+  {
+    "id": 607,
+    "name": "Grisly Gourmet"
+  },
+  {
+    "id": 280,
+    "name": "Grothdarr"
+  },
+  {
+    "id": 458,
+    "name": "Grundwulf"
+  },
+  {
+    "id": 383,
+    "name": "Gryphon's Ferocity"
+  },
+  {
+    "id": 620,
+    "name": "Gryphon's Reprisal"
+  },
+  {
+    "id": 340,
+    "name": "Hagraven's Garden"
+  },
+  {
+    "id": 263,
+    "name": "Hand of Mephala"
+  },
+  {
+    "id": 399,
+    "name": "Hanu's Compassion"
+  },
+  {
+    "id": 814,
+    "name": "Harmony in Chaos"
+  },
+  {
+    "id": 594,
+    "name": "Harpooner's Wading Kilt"
+  },
+  {
+    "id": 62,
+    "name": "Hatchling's Shell"
+  },
+  {
+    "id": 401,
+    "name": "Haven of Ursus"
+  },
+  {
+    "id": 100,
+    "name": "Hawk's Eye"
+  },
+  {
+    "id": 32,
+    "name": "Healer's Habit"
+  },
+  {
+    "id": 141,
+    "name": "Healing Mage"
+  },
+  {
+    "id": 583,
+    "name": "Heartland Conqueror"
+  },
+  {
+    "id": 259,
+    "name": "Heem-Jas' Retribution"
+  },
+  {
+    "id": 798,
+    "name": "Heroic Unity"
+  },
+  {
+    "id": 630,
+    "name": "Hew and Sunder"
+  },
+  {
+    "id": 542,
+    "name": "Hex Siphon"
+  },
+  {
+    "id": 614,
+    "name": "Hexos' Ward"
+  },
+  {
+    "id": 243,
+    "name": "Hide of Morihaus"
+  },
+  {
+    "id": 58,
+    "name": "Hide of the Werewolf"
+  },
+  {
+    "id": 764,
+    "name": "Highland Sentinel"
+  },
+  {
+    "id": 123,
+    "name": "Hircine's Veneer"
+  },
+  {
+    "id": 78,
+    "name": "Hist Bark"
+  },
+  {
+    "id": 582,
+    "name": "Hist Whisperer"
+  },
+  {
+    "id": 471,
+    "name": "Hiti's Hearth"
+  },
+  {
+    "id": 452,
+    "name": "Hollowfang Thirst"
+  },
+  {
+    "id": 618,
+    "name": "Hrothgar's Chill"
+  },
+  {
+    "id": 80,
+    "name": "Hunding's Rage"
+  },
+  {
+    "id": 216,
+    "name": "Hunt Leader"
+  },
+  {
+    "id": 845,
+    "name": "Huntsman's Warmask"
+  },
+  {
+    "id": 274,
+    "name": "Iceheart"
+  },
+  {
+    "id": 431,
+    "name": "Icy Conjurer"
+  },
+  {
+    "id": 273,
+    "name": "Ilambris"
+  },
+  {
+    "id": 599,
+    "name": "Immolator Charr"
+  },
+  {
+    "id": 136,
+    "name": "Immortal Warrior"
+  },
+  {
+    "id": 253,
+    "name": "Imperial Physique"
+  },
+  {
+    "id": 334,
+    "name": "Impregnable Armor"
+  },
+  {
+    "id": 417,
+    "name": "Indomitable Fury"
+  },
+  {
+    "id": 172,
+    "name": "Infallible Mage"
+  },
+  {
+    "id": 272,
+    "name": "Infernal Guardian"
+  },
+  {
+    "id": 351,
+    "name": "Innate Axiom"
+  },
+  {
+    "id": 333,
+    "name": "Inventor's Guard"
+  },
+  {
+    "id": 612,
+    "name": "Iron Flask"
+  },
+  {
+    "id": 337,
+    "name": "Ironblood"
+  },
+  {
+    "id": 295,
+    "name": "Jailbreaker"
+  },
+  {
+    "id": 404,
+    "name": "Jailer's Tenacity"
+  },
+  {
+    "id": 712,
+    "name": "Jerall Mountains Warchief"
+  },
+  {
+    "id": 795,
+    "name": "Jerensi's Bladestorm"
+  },
+  {
+    "id": 186,
+    "name": "Jolting Arms"
+  },
+  {
+    "id": 346,
+    "name": "Jorvuld's Guidance"
+  },
+  {
+    "id": 690,
+    "name": "Judgment of Akatosh"
+  },
+  {
+    "id": 92,
+    "name": "Kagrenac's Hope"
+  },
+  {
+    "id": 632,
+    "name": "Kargaeda"
+  },
+  {
+    "id": 815,
+    "name": "Kazpian's Cruel Signet"
+  },
+  {
+    "id": 570,
+    "name": "Kinras's Wrath"
+  },
+  {
+    "id": 479,
+    "name": "Kjalnar's Nightmare"
+  },
+  {
+    "id": 328,
+    "name": "Knight Slayer"
+  },
+  {
+    "id": 309,
+    "name": "Knight-errant's Mail"
+  },
+  {
+    "id": 35,
+    "name": "Knightmare"
+  },
+  {
+    "id": 266,
+    "name": "Kra'gh"
+  },
+  {
+    "id": 517,
+    "name": "Kraglen's Howl"
+  },
+  {
+    "id": 240,
+    "name": "Kvatch Gladiator"
+  },
+  {
+    "id": 59,
+    "name": "Kyne's Kiss"
+  },
+  {
+    "id": 492,
+    "name": "Kyne's Wind"
+  },
+  {
+    "id": 615,
+    "name": "Kynmarcher's Cruelty"
+  },
+  {
+    "id": 635,
+    "name": "Lady Malygda"
+  },
+  {
+    "id": 535,
+    "name": "Lady Thorn"
+  },
+  {
+    "id": 303,
+    "name": "Lamia's Song"
+  },
+  {
+    "id": 803,
+    "name": "Lamp Knight's Art"
+  },
+  {
+    "id": 668,
+    "name": "Languor of Peryite"
+  },
+  {
+    "id": 207,
+    "name": "Law of Julianos"
+  },
+  {
+    "id": 196,
+    "name": "Leeching Plate"
+  },
+  {
+    "id": 656,
+    "name": "Lefthander's Aegis Belt"
+  },
+  {
+    "id": 540,
+    "name": "Legacy of Karth"
+  },
+  {
+    "id": 237,
+    "name": "Leki's Focus"
+  },
+  {
+    "id": 302,
+    "name": "Leviathan"
+  },
+  {
+    "id": 109,
+    "name": "Light of Cyrodiil"
+  },
+  {
+    "id": 298,
+    "name": "Light Speaker"
+  },
+  {
+    "id": 356,
+    "name": "Livewire"
+  },
+  {
+    "id": 164,
+    "name": "Lord Warden"
+  },
+  {
+    "id": 768,
+    "name": "Lucent Echoes"
+  },
+  {
+    "id": 796,
+    "name": "Lucilla's Windshield"
+  },
+  {
+    "id": 231,
+    "name": "Lunar Bastion"
+  },
+  {
+    "id": 822,
+    "name": "Lustrous Soulwell"
+  },
+  {
+    "id": 459,
+    "name": "Maarselok"
+  },
+  {
+    "id": 758,
+    "name": "Macabre Vintage"
+  },
+  {
+    "id": 811,
+    "name": "Mad God's Dancing Shoes"
+  },
+  {
+    "id": 354,
+    "name": "Mad Tinkerer"
+  },
+  {
+    "id": 103,
+    "name": "Magicka Furnace"
+  },
+  {
+    "id": 609,
+    "name": "Magma Incarnate"
+  },
+  {
+    "id": 48,
+    "name": "Magnus' Gift"
+  },
+  {
+    "id": 520,
+    "name": "Malacath's Band of Brutality"
+  },
+  {
+    "id": 619,
+    "name": "Maligalig's Maelstrom"
+  },
+  {
+    "id": 390,
+    "name": "Mantle of Siroria"
+  },
+  {
+    "id": 670,
+    "name": "Mara's Balm"
+  },
+  {
+    "id": 466,
+    "name": "Marauder's Haste"
+  },
+  {
+    "id": 210,
+    "name": "Mark of the Pariah"
+  },
+  {
+    "id": 234,
+    "name": "Marksman's Crest"
+  },
+  {
+    "id": 625,
+    "name": "Markyn Ring of Majesty"
+  },
+  {
+    "id": 332,
+    "name": "Master Architect"
+  },
+  {
+    "id": 170,
+    "name": "Maw of the Infernal"
+  },
+  {
+    "id": 353,
+    "name": "Mechanical Acuity"
+  },
+  {
+    "id": 304,
+    "name": "Medusa"
+  },
+  {
+    "id": 416,
+    "name": "Mender's Ward"
+  },
+  {
+    "id": 369,
+    "name": "Merciless Charge"
+  },
+  {
+    "id": 94,
+    "name": "Meridia's Blessed Armor"
+  },
+  {
+    "id": 181,
+    "name": "Meritorious Service"
+  },
+  {
+    "id": 410,
+    "name": "Might of the Lost Legion"
+  },
+  {
+    "id": 256,
+    "name": "Mighty Chudan"
+  },
+  {
+    "id": 429,
+    "name": "Mighty Glacier"
+  },
+  {
+    "id": 183,
+    "name": "Molag Kena"
+  },
+  {
+    "id": 727,
+    "name": "Monolith of Storms"
+  },
+  {
+    "id": 813,
+    "name": "Monomyth Reforged"
+  },
+  {
+    "id": 402,
+    "name": "Moon Hunter"
+  },
+  {
+    "id": 230,
+    "name": "Moondancer"
+  },
+  {
+    "id": 766,
+    "name": "Mora Scribe's Thesis"
+  },
+  {
+    "id": 654,
+    "name": "Mora's Whispers"
+  },
+  {
+    "id": 219,
+    "name": "Morkuldin"
+  },
+  {
+    "id": 478,
+    "name": "Mother Ciannait"
+  },
+  {
+    "id": 292,
+    "name": "Mother's Sorrow"
+  },
+  {
+    "id": 409,
+    "name": "Naga Shaman"
+  },
+  {
+    "id": 633,
+    "name": "Nazaray"
+  },
+  {
+    "id": 98,
+    "name": "Necropotence"
+  },
+  {
+    "id": 168,
+    "name": "Nerien'eth"
+  },
+  {
+    "id": 793,
+    "name": "Netch Oil"
+  },
+  {
+    "id": 300,
+    "name": "Netch's Touch"
+  },
+  {
+    "id": 470,
+    "name": "New Moon Acolyte"
+  },
+  {
+    "id": 713,
+    "name": "Nibenay Bay Battlereeve"
+  },
+  {
+    "id": 34,
+    "name": "Night Mother's Embrace"
+  },
+  {
+    "id": 51,
+    "name": "Night Mother's Gaze"
+  },
+  {
+    "id": 112,
+    "name": "Night Terror"
+  },
+  {
+    "id": 40,
+    "name": "Night's Silence"
+  },
+  {
+    "id": 167,
+    "name": "Nightflame"
+  },
+  {
+    "id": 72,
+    "name": "Nikulas' Heavy Armor"
+  },
+  {
+    "id": 681,
+    "name": "Nix-Hound's Howl"
+  },
+  {
+    "id": 724,
+    "name": "Nobility in Decay"
+  },
+  {
+    "id": 46,
+    "name": "Noble Duelist's Silks"
+  },
+  {
+    "id": 176,
+    "name": "Noble's Conquest"
+  },
+  {
+    "id": 387,
+    "name": "Nocturnal's Favor"
+  },
+  {
+    "id": 669,
+    "name": "Nocturnal's Ploy"
+  },
+  {
+    "id": 800,
+    "name": "Noxious Boulder"
+  },
+  {
+    "id": 634,
+    "name": "Nunatak"
+  },
+  {
+    "id": 658,
+    "name": "Oakensoul Ring"
+  },
+  {
+    "id": 754,
+    "name": "Oakfather's Retribution"
+  },
+  {
+    "id": 91,
+    "name": "Oblivion's Edge"
+  },
+  {
+    "id": 73,
+    "name": "Oblivion's Foe"
+  },
+  {
+    "id": 678,
+    "name": "Old Growth Brewer"
+  },
+  {
+    "id": 284,
+    "name": "Order of Diagna"
+  },
+  {
+    "id": 640,
+    "name": "Order's Wrath"
+  },
+  {
+    "id": 84,
+    "name": "Orgnum's Scales"
+  },
+  {
+    "id": 801,
+    "name": "Orpheon the Tactician"
+  },
+  {
+    "id": 193,
+    "name": "Overwhelming Surge"
+  },
+  {
+    "id": 687,
+    "name": "Ozezan the Inferno"
+  },
+  {
+    "id": 663,
+    "name": "Pangrit Denmother"
+  },
+  {
+    "id": 214,
+    "name": "Para Bellum"
+  },
+  {
+    "id": 701,
+    "name": "Peace and Serenity"
+  },
+  {
+    "id": 648,
+    "name": "Pearlescent Ward"
+  },
+  {
+    "id": 576,
+    "name": "Pearls of Ehlnofey"
+  },
+  {
+    "id": 242,
+    "name": "Pelinal's Wrath"
+  },
+  {
+    "id": 392,
+    "name": "Perfected Aegis of Galenwe"
+  },
+  {
+    "id": 707,
+    "name": "Perfected Ansuul's Torment"
+  },
+  {
+    "id": 393,
+    "name": "Perfected Arms of Relequen"
+  },
+  {
+    "id": 591,
+    "name": "Perfected Bahsei's Mania"
+  },
+  {
+    "id": 531,
+    "name": "Perfected Caustic Arrow"
+  },
+  {
+    "id": 359,
+    "name": "Perfected Chaotic Whirlwind"
+  },
+  {
+    "id": 451,
+    "name": "Perfected Claw of Yolnahkriin"
+  },
+  {
+    "id": 361,
+    "name": "Perfected Concentrated Force"
+  },
+  {
+    "id": 652,
+    "name": "Perfected Coral Riptide"
+  },
+  {
+    "id": 524,
+    "name": "Perfected Cruel Flurry"
+  },
+  {
+    "id": 526,
+    "name": "Perfected Crushing Wall"
+  },
+  {
+    "id": 358,
+    "name": "Perfected Defensive Position"
+  },
+  {
+    "id": 532,
+    "name": "Perfected Destructive Impact"
+  },
+  {
+    "id": 357,
+    "name": "Perfected Disciplined Slash"
+  },
+  {
+    "id": 819,
+    "name": "Perfected Dolorous Arena"
+  },
+  {
+    "id": 563,
+    "name": "Perfected Executioner's Blade"
+  },
+  {
+    "id": 448,
+    "name": "Perfected Eye of Nahviintaas"
+  },
+  {
+    "id": 449,
+    "name": "Perfected False God's Devotion"
+  },
+  {
+    "id": 568,
+    "name": "Perfected Force Overflow"
+  },
+  {
+    "id": 565,
+    "name": "Perfected Frenzied Momentum"
+  },
+  {
+    "id": 423,
+    "name": "Perfected Gallant Charge"
+  },
+  {
+    "id": 533,
+    "name": "Perfected Grand Rejuvenation"
+  },
+  {
+    "id": 821,
+    "name": "Perfected Harmony in Chaos"
+  },
+  {
+    "id": 820,
+    "name": "Perfected Kazpian's Cruel Signet"
+  },
+  {
+    "id": 493,
+    "name": "Perfected Kyne's Wind"
+  },
+  {
+    "id": 771,
+    "name": "Perfected Lucent Echoes"
+  },
+  {
+    "id": 394,
+    "name": "Perfected Mantle of Siroria"
+  },
+  {
+    "id": 428,
+    "name": "Perfected Mender's Ward"
+  },
+  {
+    "id": 522,
+    "name": "Perfected Merciless Charge"
+  },
+  {
+    "id": 773,
+    "name": "Perfected Mora Scribe's Thesis"
+  },
+  {
+    "id": 708,
+    "name": "Perfected Peace and Serenity"
+  },
+  {
+    "id": 651,
+    "name": "Perfected Pearlescent Ward"
+  },
+  {
+    "id": 360,
+    "name": "Perfected Piercing Spray"
+  },
+  {
+    "id": 650,
+    "name": "Perfected Pillager's Profit"
+  },
+  {
+    "id": 566,
+    "name": "Perfected Point-Blank Snipe"
+  },
+  {
+    "id": 527,
+    "name": "Perfected Precise Regeneration"
+  },
+  {
+    "id": 529,
+    "name": "Perfected Puncturing Remedy"
+  },
+  {
+    "id": 424,
+    "name": "Perfected Radial Uppercut"
+  },
+  {
+    "id": 523,
+    "name": "Perfected Rampaging Slash"
+  },
+  {
+    "id": 818,
+    "name": "Perfected Recovery Convergence"
+  },
+  {
+    "id": 497,
+    "name": "Perfected Roaring Opportunist"
+  },
+  {
+    "id": 589,
+    "name": "Perfected Saxhleel Champion"
+  },
+  {
+    "id": 772,
+    "name": "Perfected Slivers of the Null Arca"
+  },
+  {
+    "id": 425,
+    "name": "Perfected Spectral Cloak"
+  },
+  {
+    "id": 530,
+    "name": "Perfected Stinging Slashes"
+  },
+  {
+    "id": 592,
+    "name": "Perfected Stone-Talker's Oath"
+  },
+  {
+    "id": 590,
+    "name": "Perfected Sul-Xan's Torment"
+  },
+  {
+    "id": 706,
+    "name": "Perfected Test of Resolve"
+  },
+  {
+    "id": 525,
+    "name": "Perfected Thunderous Volley"
+  },
+  {
+    "id": 362,
+    "name": "Perfected Timeless Blessing"
+  },
+  {
+    "id": 528,
+    "name": "Perfected Titanic Cleave"
+  },
+  {
+    "id": 450,
+    "name": "Perfected Tooth of Lokkestiiz"
+  },
+  {
+    "id": 705,
+    "name": "Perfected Transformative Hope"
+  },
+  {
+    "id": 395,
+    "name": "Perfected Vestment of Olorime"
+  },
+  {
+    "id": 426,
+    "name": "Perfected Virulent Shot"
+  },
+  {
+    "id": 564,
+    "name": "Perfected Void Bash"
+  },
+  {
+    "id": 495,
+    "name": "Perfected Vrol's Command"
+  },
+  {
+    "id": 653,
+    "name": "Perfected Whorl of the Depths"
+  },
+  {
+    "id": 427,
+    "name": "Perfected Wild Impulse"
+  },
+  {
+    "id": 567,
+    "name": "Perfected Wrath of Elements"
+  },
+  {
+    "id": 770,
+    "name": "Perfected Xoryn's Masterpiece"
+  },
+  {
+    "id": 499,
+    "name": "Perfected Yandir's Might"
+  },
+  {
+    "id": 211,
+    "name": "Permafrost"
+  },
+  {
+    "id": 543,
+    "name": "Pestilent Host"
+  },
+  {
+    "id": 200,
+    "name": "Phoenix"
+  },
+  {
+    "id": 672,
+    "name": "Phoenix Moth Theurge"
+  },
+  {
+    "id": 665,
+    "name": "Phylactery's Grasp"
+  },
+  {
+    "id": 366,
+    "name": "Piercing Spray"
+  },
+  {
+    "id": 649,
+    "name": "Pillager's Profit"
+  },
+  {
+    "id": 336,
+    "name": "Pillar of Nirn"
+  },
+  {
+    "id": 277,
+    "name": "Pirate Skeleton"
+  },
+  {
+    "id": 293,
+    "name": "Plague Doctor"
+  },
+  {
+    "id": 347,
+    "name": "Plague Slinger"
+  },
+  {
+    "id": 617,
+    "name": "Plaguebreak"
+  },
+  {
+    "id": 560,
+    "name": "Point-Blank Snipe"
+  },
+  {
+    "id": 143,
+    "name": "Poisonous Serpent"
+  },
+  {
+    "id": 180,
+    "name": "Powerful Assault"
+  },
+  {
+    "id": 55,
+    "name": "Prayer Shawl"
+  },
+  {
+    "id": 374,
+    "name": "Precise Regeneration"
+  },
+  {
+    "id": 608,
+    "name": "Prior Thierric"
+  },
+  {
+    "id": 26,
+    "name": "Prisoner's Rags"
+  },
+  {
+    "id": 380,
+    "name": "Prophet's"
+  },
+  {
+    "id": 314,
+    "name": "Puncturing Remedy"
+  },
+  {
+    "id": 776,
+    "name": "Pyrebrand"
+  },
+  {
+    "id": 86,
+    "name": "Queen's Elegance"
+  },
+  {
+    "id": 142,
+    "name": "Quick Serpent"
+  },
+  {
+    "id": 412,
+    "name": "Radial Uppercut"
+  },
+  {
+    "id": 536,
+    "name": "Radiant Bastion"
+  },
+  {
+    "id": 662,
+    "name": "Rage of the Ursauk"
+  },
+  {
+    "id": 812,
+    "name": "Rakkhat's Voidmantle"
+  },
+  {
+    "id": 629,
+    "name": "Rallying Cry"
+  },
+  {
+    "id": 370,
+    "name": "Rampaging Slash"
+  },
+  {
+    "id": 69,
+    "name": "Ranger's Gait"
+  },
+  {
+    "id": 311,
+    "name": "Rattlecage"
+  },
+  {
+    "id": 108,
+    "name": "Ravager"
+  },
+  {
+    "id": 201,
+    "name": "Reactive Armor"
+  },
+  {
+    "id": 722,
+    "name": "Reawakened Hierophant"
+  },
+  {
+    "id": 817,
+    "name": "Recovery Convergence"
+  },
+  {
+    "id": 539,
+    "name": "Red Eagle's Fury"
+  },
+  {
+    "id": 177,
+    "name": "Redistributor"
+  },
+  {
+    "id": 737,
+    "name": "Reflected Fury"
+  },
+  {
+    "id": 117,
+    "name": "Relics of the Physician, Ansur"
+  },
+  {
+    "id": 119,
+    "name": "Relics of the Rebellion"
+  },
+  {
+    "id": 454,
+    "name": "Renald's Resolve"
+  },
+  {
+    "id": 575,
+    "name": "Ring of the Pale Order"
+  },
+  {
+    "id": 503,
+    "name": "Ring of the Wild Hunt"
+  },
+  {
+    "id": 680,
+    "name": "Ritemaster's Bond"
+  },
+  {
+    "id": 232,
+    "name": "Roar of Alkosh"
+  },
+  {
+    "id": 496,
+    "name": "Roaring Opportunist"
+  },
+  {
+    "id": 76,
+    "name": "Robes of Alteration Mastery"
+  },
+  {
+    "id": 88,
+    "name": "Robes of Destruction Mastery"
+  },
+  {
+    "id": 66,
+    "name": "Robes of the Hist"
+  },
+  {
+    "id": 47,
+    "name": "Robes of the Withered Hand"
+  },
+  {
+    "id": 235,
+    "name": "Robes of Transmutation"
+  },
+  {
+    "id": 683,
+    "name": "Roksa the Warped"
+  },
+  {
+    "id": 760,
+    "name": "Rourken Steamguards"
+  },
+  {
+    "id": 684,
+    "name": "Runecarver's Blaze"
+  },
+  {
+    "id": 604,
+    "name": "Rush of Agony"
+  },
+  {
+    "id": 99,
+    "name": "Salvation"
+  },
+  {
+    "id": 110,
+    "name": "Sanctuary"
+  },
+  {
+    "id": 403,
+    "name": "Savage Werewolf"
+  },
+  {
+    "id": 585,
+    "name": "Saxhleel Champion"
+  },
+  {
+    "id": 190,
+    "name": "Scathing Mage"
+  },
+  {
+    "id": 434,
+    "name": "Scavenging Demise"
+  },
+  {
+    "id": 603,
+    "name": "Scorion's Feast"
+  },
+  {
+    "id": 165,
+    "name": "Scourge Harvester"
+  },
+  {
+    "id": 657,
+    "name": "Sea-Serpent's Coil"
+  },
+  {
+    "id": 697,
+    "name": "Seeker Synthesis"
+  },
+  {
+    "id": 279,
+    "name": "Selene"
+  },
+  {
+    "id": 271,
+    "name": "Sellistrix"
+  },
+  {
+    "id": 465,
+    "name": "Senchal Defender"
+  },
+  {
+    "id": 90,
+    "name": "Senche's Bite"
+  },
+  {
+    "id": 438,
+    "name": "Senche-raht's Grit"
+  },
+  {
+    "id": 268,
+    "name": "Sentinel of Rkugamz"
+  },
+  {
+    "id": 89,
+    "name": "Sentry"
+  },
+  {
+    "id": 29,
+    "name": "Sergeant's Mail"
+  },
+  {
+    "id": 641,
+    "name": "Serpent's Disdain"
+  },
+  {
+    "id": 70,
+    "name": "Seventh Legion Brute"
+  },
+  {
+    "id": 325,
+    "name": "Shacklebreaker"
+  },
+  {
+    "id": 64,
+    "name": "Shadow Dancer's Raiment"
+  },
+  {
+    "id": 49,
+    "name": "Shadow of the Red Mountain"
+  },
+  {
+    "id": 67,
+    "name": "Shadow Walker"
+  },
+  {
+    "id": 265,
+    "name": "Shadowrend"
+  },
+  {
+    "id": 95,
+    "name": "Shalidor's Curse"
+  },
+  {
+    "id": 291,
+    "name": "Shalk Exoskeleton"
+  },
+  {
+    "id": 597,
+    "name": "Shapeshifter's Chain"
+  },
+  {
+    "id": 808,
+    "name": "Shared Burden"
+  },
+  {
+    "id": 783,
+    "name": "Shared Pain"
+  },
+  {
+    "id": 695,
+    "name": "Shattered Fate"
+  },
+  {
+    "id": 848,
+    "name": "Shattered Paths Signet"
+  },
+  {
+    "id": 195,
+    "name": "Sheer Venom"
+  },
+  {
+    "id": 689,
+    "name": "Shell Splitter"
+  },
+  {
+    "id": 199,
+    "name": "Shield Breaker"
+  },
+  {
+    "id": 132,
+    "name": "Shield of the Valiant"
+  },
+  {
+    "id": 134,
+    "name": "Shroud of the Lich"
+  },
+  {
+    "id": 784,
+    "name": "Siegemaster's Focus"
+  },
+  {
+    "id": 31,
+    "name": "Silks of the Sun"
+  },
+  {
+    "id": 605,
+    "name": "Silver Rose Vigil"
+  },
+  {
+    "id": 245,
+    "name": "Sithis' Touch"
+  },
+  {
+    "id": 290,
+    "name": "Skooma Smuggler"
+  },
+  {
+    "id": 270,
+    "name": "Slimecraw"
+  },
+  {
+    "id": 767,
+    "name": "Slivers of the Null Arca"
+  },
+  {
+    "id": 386,
+    "name": "Sload's Semblance"
+  },
+  {
+    "id": 731,
+    "name": "Sluthrug's Hunger"
+  },
+  {
+    "id": 688,
+    "name": "Snake in the Stars"
+  },
+  {
+    "id": 519,
+    "name": "Snow Treaders"
+  },
+  {
+    "id": 420,
+    "name": "Soldier of Anguish"
+  },
+  {
+    "id": 81,
+    "name": "Song of Lamae"
+  },
+  {
+    "id": 726,
+    "name": "Soulcleaver"
+  },
+  {
+    "id": 114,
+    "name": "Soulshine"
+  },
+  {
+    "id": 775,
+    "name": "Spattering Disjunction"
+  },
+  {
+    "id": 627,
+    "name": "Spaulder of Ruin"
+  },
+  {
+    "id": 162,
+    "name": "Spawn of Mephala"
+  },
+  {
+    "id": 413,
+    "name": "Spectral Cloak"
+  },
+  {
+    "id": 74,
+    "name": "Spectre's Eye"
+  },
+  {
+    "id": 506,
+    "name": "Spell Parasite"
+  },
+  {
+    "id": 185,
+    "name": "Spell Power Cure"
+  },
+  {
+    "id": 418,
+    "name": "Spell Strategist"
+  },
+  {
+    "id": 830,
+    "name": "Spellshredder"
+  },
+  {
+    "id": 296,
+    "name": "Spelunker"
+  },
+  {
+    "id": 297,
+    "name": "Spider Cultist Cowl"
+  },
+  {
+    "id": 289,
+    "name": "Spinner's Garments"
+  },
+  {
+    "id": 286,
+    "name": "Spriggan's Thorns"
+  },
+  {
+    "id": 624,
+    "name": "Spriggan's Vigor"
+  },
+  {
+    "id": 797,
+    "name": "Squall of Retribution"
+  },
+  {
+    "id": 421,
+    "name": "Steadfast Hero"
+  },
+  {
+    "id": 644,
+    "name": "Steadfast's Mettle"
+  },
+  {
+    "id": 56,
+    "name": "Stendarr's Embrace"
+  },
+  {
+    "id": 315,
+    "name": "Stinging Slashes"
+  },
+  {
+    "id": 534,
+    "name": "Stone Husk"
+  },
+  {
+    "id": 661,
+    "name": "Stone's Accord"
+  },
+  {
+    "id": 588,
+    "name": "Stone-Talker's Oath"
+  },
+  {
+    "id": 827,
+    "name": "Stonehulk Domination"
+  },
+  {
+    "id": 432,
+    "name": "Stonekeeper"
+  },
+  {
+    "id": 93,
+    "name": "Storm Knight's Plate"
+  },
+  {
+    "id": 188,
+    "name": "Storm Master"
+  },
+  {
+    "id": 623,
+    "name": "Storm-Cursed's Revenge"
+  },
+  {
+    "id": 275,
+    "name": "Stormfist"
+  },
+  {
+    "id": 675,
+    "name": "Stormweaver's Cavort"
+  },
+  {
+    "id": 301,
+    "name": "Strength of the Automaton"
+  },
+  {
+    "id": 490,
+    "name": "Stuhn's Favor"
+  },
+  {
+    "id": 68,
+    "name": "Stygian"
+  },
+  {
+    "id": 586,
+    "name": "Sul-Xan's Torment"
+  },
+  {
+    "id": 159,
+    "name": "Sunderflame"
+  },
+  {
+    "id": 187,
+    "name": "Swamp Raider"
+  },
+  {
+    "id": 267,
+    "name": "Swarm Mother"
+  },
+  {
+    "id": 310,
+    "name": "Sword Dancer"
+  },
+  {
+    "id": 283,
+    "name": "Sword-Singer"
+  },
+  {
+    "id": 757,
+    "name": "Symmetry of the Weald"
+  },
+  {
+    "id": 436,
+    "name": "Symphony of Blades"
+  },
+  {
+    "id": 57,
+    "name": "Syrabane's Grip"
+  },
+  {
+    "id": 676,
+    "name": "Syrabane's Ward"
+  },
+  {
+    "id": 645,
+    "name": "Systres' Scowl"
+  },
+  {
+    "id": 228,
+    "name": "Syvarra's Scales"
+  },
+  {
+    "id": 513,
+    "name": "Talfyg's Treachery"
+  },
+  {
+    "id": 736,
+    "name": "Tarnished Nightmare"
+  },
+  {
+    "id": 224,
+    "name": "Tava's Favor"
+  },
+  {
+    "id": 696,
+    "name": "Telvanni Efficiency"
+  },
+  {
+    "id": 682,
+    "name": "Telvanni Enforcer"
+  },
+  {
+    "id": 703,
+    "name": "Test of Resolve"
+  },
+  {
+    "id": 763,
+    "name": "Tharriker's Strike"
+  },
+  {
+    "id": 97,
+    "name": "The Arch-Mage"
+  },
+  {
+    "id": 738,
+    "name": "The Blind"
+  },
+  {
+    "id": 116,
+    "name": "The Destruction Suite"
+  },
+  {
+    "id": 53,
+    "name": "The Ice Furnace"
+  },
+  {
+    "id": 63,
+    "name": "The Juggernaut"
+  },
+  {
+    "id": 50,
+    "name": "The Morag Tong"
+  },
+  {
+    "id": 851,
+    "name": "The Ruckus"
+  },
+  {
+    "id": 762,
+    "name": "The Saint and the Seducer"
+  },
+  {
+    "id": 761,
+    "name": "The Shadow Queen's Cowl"
+  },
+  {
+    "id": 278,
+    "name": "The Troll King"
+  },
+  {
+    "id": 124,
+    "name": "The Worm's Raiment"
+  },
+  {
+    "id": 248,
+    "name": "Thews of the Harbinger"
+  },
+  {
+    "id": 850,
+    "name": "Thousand Eyes"
+  },
+  {
+    "id": 501,
+    "name": "Thrassian Stranglers"
+  },
+  {
+    "id": 765,
+    "name": "Threads of War"
+  },
+  {
+    "id": 805,
+    "name": "Three Queens Wellspring"
+  },
+  {
+    "id": 606,
+    "name": "Thunder Caller"
+  },
+  {
+    "id": 30,
+    "name": "Thunderbug's Carapace"
+  },
+  {
+    "id": 372,
+    "name": "Thunderous Volley"
+  },
+  {
+    "id": 349,
+    "name": "Thurvokun"
+  },
+  {
+    "id": 809,
+    "name": "Tide-Born Wildstalker"
+  },
+  {
+    "id": 368,
+    "name": "Timeless Blessing"
+  },
+  {
+    "id": 472,
+    "name": "Titanborn Strength"
+  },
+  {
+    "id": 313,
+    "name": "Titanic Cleave"
+  },
+  {
+    "id": 826,
+    "name": "Tools of the Trapmaster"
+  },
+  {
+    "id": 445,
+    "name": "Tooth of Lokkestiiz"
+  },
+  {
+    "id": 299,
+    "name": "Toothrow"
+  },
+  {
+    "id": 693,
+    "name": "Torc of the Last Ayleid King"
+  },
+  {
+    "id": 505,
+    "name": "Torc of Tonal Constancy"
+  },
+  {
+    "id": 197,
+    "name": "Tormentor"
+  },
+  {
+    "id": 75,
+    "name": "Torug's Pact"
+  },
+  {
+    "id": 782,
+    "name": "Tracker's Lash"
+  },
+  {
+    "id": 704,
+    "name": "Transformative Hope"
+  },
+  {
+    "id": 344,
+    "name": "Trappings of Invigoration"
+  },
+  {
+    "id": 305,
+    "name": "Treasure Hunter"
+  },
+  {
+    "id": 118,
+    "name": "Treasures of the Earthforge"
+  },
+  {
+    "id": 276,
+    "name": "Tremorscale"
+  },
+  {
+    "id": 208,
+    "name": "Trial by Fire"
+  },
+  {
+    "id": 218,
+    "name": "Trinimac's Valor"
+  },
+  {
+    "id": 569,
+    "name": "True-Sworn Fury"
+  },
+  {
+    "id": 622,
+    "name": "Turning Tide"
+  },
+  {
+    "id": 161,
+    "name": "Twice-Born Star"
+  },
+  {
+    "id": 144,
+    "name": "Twice-Fanged Serpent"
+  },
+  {
+    "id": 229,
+    "name": "Twilight Remedy"
+  },
+  {
+    "id": 38,
+    "name": "Twilight's Embrace"
+  },
+  {
+    "id": 105,
+    "name": "Twin Sisters"
+  },
+  {
+    "id": 430,
+    "name": "Tzogvin's Warband"
+  },
+  {
+    "id": 345,
+    "name": "Ulfnor's Favor"
+  },
+  {
+    "id": 778,
+    "name": "Umbral Edge"
+  },
+  {
+    "id": 481,
+    "name": "Unchained Aggressor"
+  },
+  {
+    "id": 155,
+    "name": "Undaunted Bastion"
+  },
+  {
+    "id": 156,
+    "name": "Undaunted Infiltrator"
+  },
+  {
+    "id": 157,
+    "name": "Undaunted Unweaver"
+  },
+  {
+    "id": 355,
+    "name": "Unfathomable Darkness"
+  },
+  {
+    "id": 832,
+    "name": "Unflinching Ultimate"
+  },
+  {
+    "id": 572,
+    "name": "Unleashed Ritualist"
+  },
+  {
+    "id": 514,
+    "name": "Unleashed Terror"
+  },
+  {
+    "id": 169,
+    "name": "Valkyn Skoria"
+  },
+  {
+    "id": 282,
+    "name": "Vampire Cloak"
+  },
+  {
+    "id": 285,
+    "name": "Vampire Lord"
+  },
+  {
+    "id": 44,
+    "name": "Vampire's Kiss"
+  },
+  {
+    "id": 794,
+    "name": "Vandorallen's Resonance"
+  },
+  {
+    "id": 326,
+    "name": "Vanguard's Challenge"
+  },
+  {
+    "id": 241,
+    "name": "Varen's Legacy"
+  },
+  {
+    "id": 439,
+    "name": "Vastarie's Tutelage"
+  },
+  {
+    "id": 257,
+    "name": "Velidreth"
+  },
+  {
+    "id": 694,
+    "name": "Velothi Ur-Mage's Amulet"
+  },
+  {
+    "id": 129,
+    "name": "Vengeance Leech"
+  },
+  {
+    "id": 488,
+    "name": "Venomous Smite"
+  },
+  {
+    "id": 391,
+    "name": "Vestment of Olorime"
+  },
+  {
+    "id": 19,
+    "name": "Vestments of the Warlock"
+  },
+  {
+    "id": 441,
+    "name": "Vesture of Darloc Brae"
+  },
+  {
+    "id": 247,
+    "name": "Vicecanon of Venom"
+  },
+  {
+    "id": 236,
+    "name": "Vicious Death"
+  },
+  {
+    "id": 173,
+    "name": "Vicious Serpent"
+  },
+  {
+    "id": 33,
+    "name": "Viper's Sting"
+  },
+  {
+    "id": 414,
+    "name": "Virulent Shot"
+  },
+  {
+    "id": 698,
+    "name": "Vivec's Duality"
+  },
+  {
+    "id": 558,
+    "name": "Void Bash"
+  },
+  {
+    "id": 537,
+    "name": "Voidcaller"
+  },
+  {
+    "id": 494,
+    "name": "Vrol's Command"
+  },
+  {
+    "id": 823,
+    "name": "Vykand's Soulfury"
+  },
+  {
+    "id": 398,
+    "name": "Vykosa"
+  },
+  {
+    "id": 331,
+    "name": "War Machine"
+  },
+  {
+    "id": 320,
+    "name": "War Maiden"
+  },
+  {
+    "id": 111,
+    "name": "Ward of Cyrodiil"
+  },
+  {
+    "id": 239,
+    "name": "Warrior's Fury"
+  },
+  {
+    "id": 322,
+    "name": "Warrior-Poet"
+  },
+  {
+    "id": 146,
+    "name": "Way of Air"
+  },
+  {
+    "id": 145,
+    "name": "Way of Fire"
+  },
+  {
+    "id": 147,
+    "name": "Way of Martial Knowledge"
+  },
+  {
+    "id": 148,
+    "name": "Way of the Arena"
+  },
+  {
+    "id": 41,
+    "name": "Whitestrake's Retribution"
+  },
+  {
+    "id": 646,
+    "name": "Whorl of the Depths"
+  },
+  {
+    "id": 262,
+    "name": "Widowmaker"
+  },
+  {
+    "id": 415,
+    "name": "Wild Impulse"
+  },
+  {
+    "id": 106,
+    "name": "Wilderqueen's Arch"
+  },
+  {
+    "id": 79,
+    "name": "Willow's Path"
+  },
+  {
+    "id": 205,
+    "name": "Willpower"
+  },
+  {
+    "id": 487,
+    "name": "Winter's Respite"
+  },
+  {
+    "id": 217,
+    "name": "Winterborn"
+  },
+  {
+    "id": 384,
+    "name": "Wisdom of Vanus"
+  },
+  {
+    "id": 139,
+    "name": "Wise Mage"
+  },
+  {
+    "id": 538,
+    "name": "Witch-Knight's Defiance"
+  },
+  {
+    "id": 20,
+    "name": "Witchman Armor"
+  },
+  {
+    "id": 329,
+    "name": "Wizard's Riposte"
+  },
+  {
+    "id": 561,
+    "name": "Wrath of Elements"
+  },
+  {
+    "id": 125,
+    "name": "Wrath of the Imperium"
+  },
+  {
+    "id": 728,
+    "name": "Wrathsun"
+  },
+  {
+    "id": 610,
+    "name": "Wretched Vitality"
+  },
+  {
+    "id": 107,
+    "name": "Wyrd Tree's Blessing"
+  },
+  {
+    "id": 846,
+    "name": "Xanmeer Genesis"
+  },
+  {
+    "id": 825,
+    "name": "Xanmeer Spellweaver"
+  },
+  {
+    "id": 769,
+    "name": "Xoryn's Masterpiece"
+  },
+  {
+    "id": 498,
+    "name": "Yandir's Might"
+  },
+  {
+    "id": 294,
+    "name": "Ysgramor's Birthright"
+  },
+  {
+    "id": 455,
+    "name": "Z'en's Redress"
+  },
+  {
+    "id": 350,
+    "name": "Zaan"
+  },
+  {
+    "id": 598,
+    "name": "Zoal the Ever-Wakeful"
+  }
+]

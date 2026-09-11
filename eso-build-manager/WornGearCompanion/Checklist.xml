@@ -1,0 +1,36 @@
+<GuiXml>
+    <Controls>
+        <TopLevelControl name="WGCChecklist" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true">
+            <Dimensions x="280" y="230" />
+            <Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="0" offsetY="-100" />
+            <OnMoveStop>WGC.Checklist_OnMoveStop(self)</OnMoveStop>
+            <Controls>
+                <Backdrop name="$(parent)Bg" inherits="ZO_DefaultBackdrop">
+                    <AnchorFill />
+                </Backdrop>
+
+                <Label name="$(parent)Title" font="ZoFontWinT1" text="Daily Checklist" horizontalAlignment="CENTER">
+                    <Dimensions x="260" y="24" />
+                    <Anchor point="TOP" offsetY="8" />
+                </Label>
+
+                <Button name="$(parent)Close">
+                    <Dimensions x="20" y="20" />
+                    <Anchor point="TOPRIGHT" offsetX="-4" offsetY="4" />
+                    <Textures normal="EsoUI/Art/Buttons/decline_up.dds" pressed="EsoUI/Art/Buttons/decline_down.dds" mouseOver="EsoUI/Art/Buttons/decline_over.dds" />
+                    <OnClicked>WGC.Checklist_Toggle()</OnClicked>
+                </Button>
+
+                <Control name="$(parent)Rows">
+                    <Dimensions x="260" y="170" />
+                    <Anchor point="TOP" offsetY="38" />
+                </Control>
+
+                <Label name="$(parent)Footer" font="ZoFontGameXSmall" horizontalAlignment="CENTER">
+                    <Dimensions x="260" y="16" />
+                    <Anchor point="BOTTOM" offsetY="-6" />
+                </Label>
+            </Controls>
+        </TopLevelControl>
+    </Controls>
+</GuiXml>

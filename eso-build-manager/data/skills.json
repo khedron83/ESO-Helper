@@ -1,0 +1,1883 @@
+[
+  {
+    "category": "Dragonknight",
+    "line": "Ardent Flame",
+    "skills": [
+      {
+        "base": "Dragonknight Standard",
+        "morphs": [
+          "Shifting Standard",
+          "Standard of Might"
+        ]
+      },
+      {
+        "base": "Lava Whip",
+        "morphs": [
+          "Molten Whip",
+          "Flame Lash"
+        ]
+      },
+      {
+        "base": "Searing Strike",
+        "morphs": [
+          "Searing Claw",
+          "Burning Embers"
+        ]
+      },
+      {
+        "base": "Inferno",
+        "morphs": [
+          "Incinerate",
+          "Cauterize"
+        ]
+      },
+      {
+        "base": "Chains of Devastation",
+        "morphs": [
+          "Chains of Devastation",
+          "Chains of Dominance"
+        ]
+      },
+      {
+        "base": "Engulfing Flames",
+        "morphs": [
+          "Burning Breath",
+          "Noxious Breath"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Dragonknight",
+    "line": "Draconic Power",
+    "skills": [
+      {
+        "base": "Dragon Leap",
+        "morphs": [
+          "Take Flight",
+          "Ferocious Leap"
+        ]
+      },
+      {
+        "base": "Inhale",
+        "morphs": [
+          "Draw Essence",
+          "Deep Breath"
+        ]
+      },
+      {
+        "base": "Dark Talons",
+        "morphs": [
+          "Burning Talons",
+          "Choking Talons"
+        ]
+      },
+      {
+        "base": "Dragon Blood",
+        "morphs": [
+          "Coagulating Blood",
+          "Green Dragon Blood"
+        ]
+      },
+      {
+        "base": "Hardened Armor",
+        "morphs": [
+          "Volatile Armor",
+          "Cinder Storm"
+        ]
+      },
+      {
+        "base": "Wing Buffet",
+        "morphs": [
+          "Fleetstep Wings",
+          "Protect the Brood"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Dragonknight",
+    "line": "Earthen Heart",
+    "skills": [
+      {
+        "base": "Magma Armor",
+        "morphs": [
+          "Magma Shell",
+          "Corrosive Armor"
+        ]
+      },
+      {
+        "base": "Stonefist",
+        "morphs": [
+          "Stone Giant",
+          "Obsidian Shard"
+        ]
+      },
+      {
+        "base": "Molten Weapons",
+        "morphs": [
+          "Igneous Weapons",
+          "Molten Armaments"
+        ]
+      },
+      {
+        "base": "Obsidian Shield",
+        "morphs": [
+          "Igneous Shield",
+          "Fragmented Shield"
+        ]
+      },
+      {
+        "base": "Petrify",
+        "morphs": [
+          "Fossilize",
+          "Shattering Rocks"
+        ]
+      },
+      {
+        "base": "Ash Cloud",
+        "morphs": [
+          "Cinder Storm",
+          "Eruption"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Sorcerer",
+    "line": "Dark Magic",
+    "skills": [
+      {
+        "base": "Negate Magic",
+        "morphs": [
+          "Suppression Field",
+          "Absorption Field"
+        ]
+      },
+      {
+        "base": "Crystal Shard",
+        "morphs": [
+          "Crystal Weapon",
+          "Crystal Fragments"
+        ]
+      },
+      {
+        "base": "Encase",
+        "morphs": [
+          "Shattering Spines",
+          "Vibrant Shroud"
+        ]
+      },
+      {
+        "base": "Rune Prison",
+        "morphs": [
+          "Rune Cage",
+          "Defensive Rune"
+        ]
+      },
+      {
+        "base": "Dark Exchange",
+        "morphs": [
+          "Dark Deal",
+          "Dark Conversion"
+        ]
+      },
+      {
+        "base": "Daedric Mines",
+        "morphs": [
+          "Daedric Tomb",
+          "Daedric Refuge"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Sorcerer",
+    "line": "Daedric Summoning",
+    "skills": [
+      {
+        "base": "Summon Storm Atronach",
+        "morphs": [
+          "Greater Storm Atronach",
+          "Summon Charged Atronach"
+        ]
+      },
+      {
+        "base": "Unstable Familiar",
+        "morphs": [
+          "Unstable Clannfear",
+          "Volatile Familiar"
+        ]
+      },
+      {
+        "base": "Daedric Curse",
+        "morphs": [
+          "Daedric Prey",
+          "Haunting Curse"
+        ]
+      },
+      {
+        "base": "Summon Winged Twilight",
+        "morphs": [
+          "Summon Twilight Tormentor",
+          "Summon Twilight Matriarch"
+        ]
+      },
+      {
+        "base": "Conjured Ward",
+        "morphs": [
+          "Hardened Ward",
+          "Regenerative Ward"
+        ]
+      },
+      {
+        "base": "Bound Armor",
+        "morphs": [
+          "Bound Armaments",
+          "Bound Aegis"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Sorcerer",
+    "line": "Storm Calling",
+    "skills": [
+      {
+        "base": "Overload",
+        "morphs": [
+          "Power Overload",
+          "Energy Overload"
+        ]
+      },
+      {
+        "base": "Mage's Fury",
+        "morphs": [
+          "Mage's Wrath",
+          "Endless Fury"
+        ]
+      },
+      {
+        "base": "Lightning Form",
+        "morphs": [
+          "Hurricane",
+          "Boundless Storm"
+        ]
+      },
+      {
+        "base": "Lightning Splash",
+        "morphs": [
+          "Liquid Lightning",
+          "Lightning Flood"
+        ]
+      },
+      {
+        "base": "Surge",
+        "morphs": [
+          "Power Surge",
+          "Critical Surge"
+        ]
+      },
+      {
+        "base": "Bolt Escape",
+        "morphs": [
+          "Streak",
+          "Ball of Lightning"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Nightblade",
+    "line": "Assassination",
+    "skills": [
+      {
+        "base": "Incapacitating Strike",
+        "morphs": [
+          "Soul Harvest",
+          "Assassin's Will"
+        ]
+      },
+      {
+        "base": "Assassin's Blade",
+        "morphs": [
+          "Killer's Blade",
+          "Impale"
+        ]
+      },
+      {
+        "base": "Teleport Strike",
+        "morphs": [
+          "Lotus Fan",
+          "Ambush"
+        ]
+      },
+      {
+        "base": "Blur",
+        "morphs": [
+          "Mirage",
+          "Phantasmal Escape"
+        ]
+      },
+      {
+        "base": "Mark Target",
+        "morphs": [
+          "Piercing Mark",
+          "Reaper's Mark"
+        ]
+      },
+      {
+        "base": "Grim Focus",
+        "morphs": [
+          "Relentless Focus",
+          "Merciless Resolve"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Nightblade",
+    "line": "Shadow",
+    "skills": [
+      {
+        "base": "Consuming Darkness",
+        "morphs": [
+          "Bolstering Darkness",
+          "Veil of Blades"
+        ]
+      },
+      {
+        "base": "Veiled Strike",
+        "morphs": [
+          "Surprise Attack",
+          "Concealed Weapon"
+        ]
+      },
+      {
+        "base": "Shadow Cloak",
+        "morphs": [
+          "Shadowy Disguise",
+          "Dark Cloak"
+        ]
+      },
+      {
+        "base": "Path of Darkness",
+        "morphs": [
+          "Twisting Path",
+          "Refreshing Path"
+        ]
+      },
+      {
+        "base": "Aspect of Terror",
+        "morphs": [
+          "Mass Hysteria",
+          "Manifestation of Terror"
+        ]
+      },
+      {
+        "base": "Summon Shade",
+        "morphs": [
+          "Dark Shades",
+          "Shadow Image"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Nightblade",
+    "line": "Siphoning",
+    "skills": [
+      {
+        "base": "Soul Shred",
+        "morphs": [
+          "Soul Siphon",
+          "Soul Tether"
+        ]
+      },
+      {
+        "base": "Strife",
+        "morphs": [
+          "Funnel Health",
+          "Swallow Soul"
+        ]
+      },
+      {
+        "base": "Malevolent Offering",
+        "morphs": [
+          "Healthy Offering",
+          "Shrewd Offering"
+        ]
+      },
+      {
+        "base": "Cripple",
+        "morphs": [
+          "Debilitate",
+          "Crippling Grasp"
+        ]
+      },
+      {
+        "base": "Siphoning Strikes",
+        "morphs": [
+          "Leeching Strikes",
+          "Siphoning Attacks"
+        ]
+      },
+      {
+        "base": "Drain Power",
+        "morphs": [
+          "Power Extraction",
+          "Sap Essence"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Templar",
+    "line": "Aedric Spear",
+    "skills": [
+      {
+        "base": "Radial Sweep",
+        "morphs": [
+          "Everlasting Sweep",
+          "Crescent Sweep"
+        ]
+      },
+      {
+        "base": "Puncturing Strikes",
+        "morphs": [
+          "Biting Jabs",
+          "Puncturing Sweep"
+        ]
+      },
+      {
+        "base": "Piercing Javelin",
+        "morphs": [
+          "Aurora Javelin",
+          "Binding Javelin"
+        ]
+      },
+      {
+        "base": "Focused Charge",
+        "morphs": [
+          "Explosive Charge",
+          "Toppling Charge"
+        ]
+      },
+      {
+        "base": "Spear Shards",
+        "morphs": [
+          "Luminous Shards",
+          "Blazing Spear"
+        ]
+      },
+      {
+        "base": "Sun Shield",
+        "morphs": [
+          "Radiant Ward",
+          "Blazing Shield"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Templar",
+    "line": "Dawn's Wrath",
+    "skills": [
+      {
+        "base": "Nova",
+        "morphs": [
+          "Solar Prison",
+          "Solar Disturbance"
+        ]
+      },
+      {
+        "base": "Sun Fire",
+        "morphs": [
+          "Vampire's Bane",
+          "Reflective Light"
+        ]
+      },
+      {
+        "base": "Solar Flare",
+        "morphs": [
+          "Dark Flare",
+          "Solar Barrage"
+        ]
+      },
+      {
+        "base": "Backlash",
+        "morphs": [
+          "Purifying Light",
+          "Power of the Light"
+        ]
+      },
+      {
+        "base": "Eclipse",
+        "morphs": [
+          "Living Dark",
+          "Unstable Core"
+        ]
+      },
+      {
+        "base": "Radiant Destruction",
+        "morphs": [
+          "Radiant Glory",
+          "Radiant Oppression"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Templar",
+    "line": "Restoring Light",
+    "skills": [
+      {
+        "base": "Rite of Passage",
+        "morphs": [
+          "Remembrance",
+          "Practiced Incarnation"
+        ]
+      },
+      {
+        "base": "Rushed Ceremony",
+        "morphs": [
+          "Honor the Dead",
+          "Breath of Life"
+        ]
+      },
+      {
+        "base": "Healing Ritual",
+        "morphs": [
+          "Ritual of Rebirth",
+          "Hasty Prayer"
+        ]
+      },
+      {
+        "base": "Cleansing Ritual",
+        "morphs": [
+          "Ritual of Retribution",
+          "Extended Ritual"
+        ]
+      },
+      {
+        "base": "Rune Focus",
+        "morphs": [
+          "Channeled Focus",
+          "Restoring Focus"
+        ]
+      },
+      {
+        "base": "Sacred Ground",
+        "morphs": [
+          "Purifying Light",
+          "Holy Ground"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Warden",
+    "line": "Animal Companions",
+    "skills": [
+      {
+        "base": "Feral Guardian",
+        "morphs": [
+          "Eternal Guardian",
+          "Wild Guardian"
+        ]
+      },
+      {
+        "base": "Dive",
+        "morphs": [
+          "Cutting Dive",
+          "Screaming Cliff Racer"
+        ]
+      },
+      {
+        "base": "Scorch",
+        "morphs": [
+          "Subterranean Assault",
+          "Deep Fissure"
+        ]
+      },
+      {
+        "base": "Swarm",
+        "morphs": [
+          "Fetcher Infection",
+          "Growing Swarm"
+        ]
+      },
+      {
+        "base": "Betty Netch",
+        "morphs": [
+          "Blue Betty",
+          "Bull Netch"
+        ]
+      },
+      {
+        "base": "Falcon's Swiftness",
+        "morphs": [
+          "Deceptive Predator",
+          "Bird of Prey"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Warden",
+    "line": "Green Balance",
+    "skills": [
+      {
+        "base": "Secluded Grove",
+        "morphs": [
+          "Enchanted Forest",
+          "Healing Thicket"
+        ]
+      },
+      {
+        "base": "Fungal Growth",
+        "morphs": [
+          "Enchanted Growth",
+          "Soothing Spores"
+        ]
+      },
+      {
+        "base": "Healing Seed",
+        "morphs": [
+          "Budding Seeds",
+          "Corrupting Pollen"
+        ]
+      },
+      {
+        "base": "Living Vines",
+        "morphs": [
+          "Leeching Vines",
+          "Living Trellis"
+        ]
+      },
+      {
+        "base": "Lotus Flower",
+        "morphs": [
+          "Green Lotus",
+          "Lotus Blossom"
+        ]
+      },
+      {
+        "base": "Nature's Grasp",
+        "morphs": [
+          "Bursting Vines",
+          "Nature's Embrace"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Warden",
+    "line": "Winter's Embrace",
+    "skills": [
+      {
+        "base": "Sleet Storm",
+        "morphs": [
+          "Northern Storm",
+          "Permafrost"
+        ]
+      },
+      {
+        "base": "Frost Cloak",
+        "morphs": [
+          "Expansive Frost Cloak",
+          "Ice Fortress"
+        ]
+      },
+      {
+        "base": "Impaling Shards",
+        "morphs": [
+          "Gripping Shards",
+          "Winter's Revenge"
+        ]
+      },
+      {
+        "base": "Arctic Wind",
+        "morphs": [
+          "Polar Wind",
+          "Arctic Blast"
+        ]
+      },
+      {
+        "base": "Crystallized Shield",
+        "morphs": [
+          "Crystallized Slab",
+          "Shimmering Shield"
+        ]
+      },
+      {
+        "base": "Frozen Gate",
+        "morphs": [
+          "Frozen Device",
+          "Frozen Retreat"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Necromancer",
+    "line": "Grave Lord",
+    "skills": [
+      {
+        "base": "Frozen Colossus",
+        "morphs": [
+          "Pestilent Colossus",
+          "Glacial Colossus"
+        ]
+      },
+      {
+        "base": "Flame Skull",
+        "morphs": [
+          "Venom Skull",
+          "Ricochet Skull"
+        ]
+      },
+      {
+        "base": "Blastbones",
+        "morphs": [
+          "Blighted Blastbones",
+          "Stalking Blastbones"
+        ]
+      },
+      {
+        "base": "Boneyard",
+        "morphs": [
+          "Unnerving Boneyard",
+          "Avid Boneyard"
+        ]
+      },
+      {
+        "base": "Skeletal Mage",
+        "morphs": [
+          "Skeletal Archer",
+          "Skeletal Arcanist"
+        ]
+      },
+      {
+        "base": "Shocking Siphon",
+        "morphs": [
+          "Detonating Siphon",
+          "Mystic Siphon"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Necromancer",
+    "line": "Bone Tyrant",
+    "skills": [
+      {
+        "base": "Bone Goliath Transformation",
+        "morphs": [
+          "Pummeling Goliath",
+          "Ravenous Goliath"
+        ]
+      },
+      {
+        "base": "Death Scythe",
+        "morphs": [
+          "Ruinous Scythe",
+          "Hungry Scythe"
+        ]
+      },
+      {
+        "base": "Bone Armor",
+        "morphs": [
+          "Beckoning Armor",
+          "Summoner's Armor"
+        ]
+      },
+      {
+        "base": "Bitter Harvest",
+        "morphs": [
+          "Deaden Pain",
+          "Necrotic Potency"
+        ]
+      },
+      {
+        "base": "Bone Totem",
+        "morphs": [
+          "Remote Totem",
+          "Agony Totem"
+        ]
+      },
+      {
+        "base": "Grave Grasp",
+        "morphs": [
+          "Ghostly Embrace",
+          "Empowering Grasp"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Necromancer",
+    "line": "Living Death",
+    "skills": [
+      {
+        "base": "Reanimate",
+        "morphs": [
+          "Renewing Animation",
+          "Animate Blastbones"
+        ]
+      },
+      {
+        "base": "Render Flesh",
+        "morphs": [
+          "Resistant Flesh",
+          "Blood Sacrifice"
+        ]
+      },
+      {
+        "base": "Expunge",
+        "morphs": [
+          "Expunge & Modify",
+          "Hexproof"
+        ]
+      },
+      {
+        "base": "Life amid Death",
+        "morphs": [
+          "Renewing Undeath",
+          "Enduring Undeath"
+        ]
+      },
+      {
+        "base": "Spirit Mender",
+        "morphs": [
+          "Spirit Guardian",
+          "Intensive Mender"
+        ]
+      },
+      {
+        "base": "Restoring Tether",
+        "morphs": [
+          "Braided Tether",
+          "Mortal Coil"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Arcanist",
+    "line": "Herald of the Tome",
+    "skills": [
+      {
+        "base": "The Tide King's Gaze",
+        "morphs": [
+          "The Unblinking Eye",
+          "The Languid Eye"
+        ]
+      },
+      {
+        "base": "Runeblades",
+        "morphs": [
+          "Escalating Runeblades",
+          "Writhing Runeblades"
+        ]
+      },
+      {
+        "base": "Fatecarver",
+        "morphs": [
+          "Exhausting Fatecarver",
+          "Pragmatic Fatecarver"
+        ]
+      },
+      {
+        "base": "Abyssal Impact",
+        "morphs": [
+          "Cephaliarch's Flail",
+          "Tentacular Dread"
+        ]
+      },
+      {
+        "base": "Tome-Bearer's Inspiration",
+        "morphs": [
+          "Inspired Scholarship",
+          "Recuperative Treatise"
+        ]
+      },
+      {
+        "base": "The Imperfect Ring",
+        "morphs": [
+          "Fulminating Rune",
+          "Rune of Displacement"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Arcanist",
+    "line": "Soldier of Apocrypha",
+    "skills": [
+      {
+        "base": "Gibbering Shield",
+        "morphs": [
+          "Gibbering Shelter",
+          "Sanctum of the Abyssal Sea"
+        ]
+      },
+      {
+        "base": "Runic Jolt",
+        "morphs": [
+          "Runic Embrace",
+          "Runic Sunder"
+        ]
+      },
+      {
+        "base": "Runespite Ward",
+        "morphs": [
+          "Impervious Runeward",
+          "Spiteward of the Lucid Mind"
+        ]
+      },
+      {
+        "base": "Fatewoven Armor",
+        "morphs": [
+          "Cruxweaver Armor",
+          "Unbreakable Fate"
+        ]
+      },
+      {
+        "base": "Runic Defense",
+        "morphs": [
+          "Runeguard of Freedom",
+          "Runeguard of Still Waters"
+        ]
+      },
+      {
+        "base": "Rune of Eldritch Horror",
+        "morphs": [
+          "Rune of Uncanny Adoration",
+          "Rune of the Colorless Pool"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Arcanist",
+    "line": "Curative Runeforms",
+    "skills": [
+      {
+        "base": "Vitalizing Glyphic",
+        "morphs": [
+          "Glyphic of the Tides",
+          "Resonating Glyphic"
+        ]
+      },
+      {
+        "base": "Runemend",
+        "morphs": [
+          "Audacious Runemend",
+          "Evolving Runemend"
+        ]
+      },
+      {
+        "base": "Remedy Cascade",
+        "morphs": [
+          "Cascading Fortune",
+          "Curative Surge"
+        ]
+      },
+      {
+        "base": "Chakram Shields",
+        "morphs": [
+          "Chakram of Destiny",
+          "Tidal Chakram"
+        ]
+      },
+      {
+        "base": "Arcanist's Domain",
+        "morphs": [
+          "Reconstructive Domain",
+          "Zenas' Empowering Disc"
+        ]
+      },
+      {
+        "base": "Apocryphal Gate",
+        "morphs": [
+          "Fleet-footed Gate",
+          "Passage Between Worlds"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Weapon",
+    "line": "Two Handed",
+    "skills": [
+      {
+        "base": "Berserker Strike",
+        "morphs": [
+          "Onslaught",
+          "Berserker Rage"
+        ]
+      },
+      {
+        "base": "Uppercut",
+        "morphs": [
+          "Dizzying Swing",
+          "Wrecking Blow"
+        ]
+      },
+      {
+        "base": "Critical Charge",
+        "morphs": [
+          "Stampede",
+          "Critical Rush"
+        ]
+      },
+      {
+        "base": "Cleave",
+        "morphs": [
+          "Carve",
+          "Brawler"
+        ]
+      },
+      {
+        "base": "Reverse Slash",
+        "morphs": [
+          "Reverse Slice",
+          "Executioner"
+        ]
+      },
+      {
+        "base": "Momentum",
+        "morphs": [
+          "Forward Momentum",
+          "Rally"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Weapon",
+    "line": "One Hand and Shield",
+    "skills": [
+      {
+        "base": "Shield Wall",
+        "morphs": [
+          "Spell Wall",
+          "Shield Discipline"
+        ]
+      },
+      {
+        "base": "Pierce Armor",
+        "morphs": [
+          "Ransack",
+          "Puncture"
+        ]
+      },
+      {
+        "base": "Low Slash",
+        "morphs": [
+          "Heroic Slash",
+          "Deep Slash"
+        ]
+      },
+      {
+        "base": "Defensive Posture",
+        "morphs": [
+          "Defensive Stance",
+          "Absorb Magic"
+        ]
+      },
+      {
+        "base": "Shield Charge",
+        "morphs": [
+          "Shielded Assault",
+          "Invasion"
+        ]
+      },
+      {
+        "base": "Power Bash",
+        "morphs": [
+          "Reverberating Bash",
+          "Power Slam"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Weapon",
+    "line": "Dual Wield",
+    "skills": [
+      {
+        "base": "Lacerate",
+        "morphs": [
+          "Rend",
+          "Thrive in Chaos"
+        ]
+      },
+      {
+        "base": "Flurry",
+        "morphs": [
+          "Rapid Strikes",
+          "Bloodthirst"
+        ]
+      },
+      {
+        "base": "Twin Slashes",
+        "morphs": [
+          "Rending Slashes",
+          "Blood Craze"
+        ]
+      },
+      {
+        "base": "Whirlwind",
+        "morphs": [
+          "Whirling Blades",
+          "Steel Tornado"
+        ]
+      },
+      {
+        "base": "Blade Cloak",
+        "morphs": [
+          "Quick Cloak",
+          "Deadly Cloak"
+        ]
+      },
+      {
+        "base": "Hidden Blade",
+        "morphs": [
+          "Shrouded Daggers",
+          "Flying Blade"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Weapon",
+    "line": "Bow",
+    "skills": [
+      {
+        "base": "Rapid Fire",
+        "morphs": [
+          "Toxic Barrage",
+          "Ballista"
+        ]
+      },
+      {
+        "base": "Snipe",
+        "morphs": [
+          "Lethal Arrow",
+          "Focused Aim"
+        ]
+      },
+      {
+        "base": "Volley",
+        "morphs": [
+          "Endless Hail",
+          "Arrow Barrage"
+        ]
+      },
+      {
+        "base": "Scatter Shot",
+        "morphs": [
+          "Magnum Shot",
+          "Draining Shot"
+        ]
+      },
+      {
+        "base": "Arrow Spray",
+        "morphs": [
+          "Bombard",
+          "Acid Spray"
+        ]
+      },
+      {
+        "base": "Poison Arrow",
+        "morphs": [
+          "Venom Arrow",
+          "Poison Injection"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Weapon",
+    "line": "Destruction Staff",
+    "skills": [
+      {
+        "base": "Elemental Storm",
+        "morphs": [
+          "Elemental Rage",
+          "Eye of the Storm"
+        ]
+      },
+      {
+        "base": "Force Shock",
+        "morphs": [
+          "Crushing Shock",
+          "Force Pulse"
+        ]
+      },
+      {
+        "base": "Wall of Elements",
+        "morphs": [
+          "Unstable Wall of Elements",
+          "Elemental Blockade"
+        ]
+      },
+      {
+        "base": "Destructive Touch",
+        "morphs": [
+          "Destructive Clench",
+          "Destructive Reach"
+        ]
+      },
+      {
+        "base": "Weakness to Elements",
+        "morphs": [
+          "Elemental Susceptibility",
+          "Elemental Drain"
+        ]
+      },
+      {
+        "base": "Impulse",
+        "morphs": [
+          "Elemental Ring",
+          "Pulsar"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Weapon",
+    "line": "Restoration Staff",
+    "skills": [
+      {
+        "base": "Panacea",
+        "morphs": [
+          "Life Giver",
+          "Light's Champion"
+        ]
+      },
+      {
+        "base": "Grand Healing",
+        "morphs": [
+          "Illustrious Healing",
+          "Healing Springs"
+        ]
+      },
+      {
+        "base": "Regeneration",
+        "morphs": [
+          "Rapid Regeneration",
+          "Radiating Regeneration"
+        ]
+      },
+      {
+        "base": "Blessing of Protection",
+        "morphs": [
+          "Blessing of Restoration",
+          "Combat Prayer"
+        ]
+      },
+      {
+        "base": "Steadfast Ward",
+        "morphs": [
+          "Ward Ally",
+          "Healing Ward"
+        ]
+      },
+      {
+        "base": "Force Siphon",
+        "morphs": [
+          "Siphon Spirit",
+          "Quick Siphon"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Guild",
+    "line": "Fighters Guild",
+    "skills": [
+      {
+        "base": "Dawnbreaker",
+        "morphs": [
+          "Flawless Dawnbreaker",
+          "Dawnbreaker of Smiting"
+        ]
+      },
+      {
+        "base": "Silver Bolts",
+        "morphs": [
+          "Silver Shards",
+          "Silver Leash"
+        ]
+      },
+      {
+        "base": "Circle of Protection",
+        "morphs": [
+          "Turn Evil",
+          "Ring of Preservation"
+        ]
+      },
+      {
+        "base": "Expert Hunter",
+        "morphs": [
+          "Evil Hunter",
+          "Camouflaged Hunter"
+        ]
+      },
+      {
+        "base": "Trap Beast",
+        "morphs": [
+          "Barbed Trap",
+          "Lightweight Beast Trap"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Guild",
+    "line": "Mages Guild",
+    "skills": [
+      {
+        "base": "Meteor",
+        "morphs": [
+          "Ice Comet",
+          "Shooting Star"
+        ]
+      },
+      {
+        "base": "Magelight",
+        "morphs": [
+          "Inner Light",
+          "Radiant Magelight"
+        ]
+      },
+      {
+        "base": "Entropy",
+        "morphs": [
+          "Degeneration",
+          "Structured Entropy"
+        ]
+      },
+      {
+        "base": "Fire Rune",
+        "morphs": [
+          "Volcanic Rune",
+          "Scalding Rune"
+        ]
+      },
+      {
+        "base": "Equilibrium",
+        "morphs": [
+          "Balance",
+          "Spell Symmetry"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Guild",
+    "line": "Undaunted",
+    "skills": [
+      {
+        "base": "Blood Altar",
+        "morphs": [
+          "Sanguine Altar",
+          "Overflowing Altar"
+        ]
+      },
+      {
+        "base": "Trapping Webs",
+        "morphs": [
+          "Shadow Silk",
+          "Tangling Webs"
+        ]
+      },
+      {
+        "base": "Inner Fire",
+        "morphs": [
+          "Inner Rage",
+          "Inner Beast"
+        ]
+      },
+      {
+        "base": "Bone Shield",
+        "morphs": [
+          "Spiked Bone Shield",
+          "Bone Surge"
+        ]
+      },
+      {
+        "base": "Necrotic Orb",
+        "morphs": [
+          "Mystic Orb",
+          "Energy Orb"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Guild",
+    "line": "Psijic Order",
+    "skills": [
+      {
+        "base": "Undo",
+        "morphs": [
+          "Precognition",
+          "Temporal Guard"
+        ]
+      },
+      {
+        "base": "Time Stop",
+        "morphs": [
+          "Borrowed Time",
+          "Time Freeze"
+        ]
+      },
+      {
+        "base": "Imbue Weapon",
+        "morphs": [
+          "Elemental Weapon",
+          "Crushing Weapon"
+        ]
+      },
+      {
+        "base": "Accelerate",
+        "morphs": [
+          "Channeled Acceleration",
+          "Race Against Time"
+        ]
+      },
+      {
+        "base": "Mend Wounds",
+        "morphs": [
+          "Mend Spirit",
+          "Symbiosis"
+        ]
+      },
+      {
+        "base": "Meditate",
+        "morphs": [
+          "Deep Thoughts",
+          "Introspection"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Alliance War",
+    "line": "Assault",
+    "skills": [
+      {
+        "base": "War Horn",
+        "morphs": [
+          "Aggressive Horn",
+          "Sturdy Horn"
+        ]
+      },
+      {
+        "base": "Vigor",
+        "morphs": [
+          "Echoing Vigor",
+          "Resolving Vigor"
+        ]
+      },
+      {
+        "base": "Rapid Maneuver",
+        "morphs": [
+          "Retreating Maneuver",
+          "Charging Maneuver"
+        ]
+      },
+      {
+        "base": "Caltrops",
+        "morphs": [
+          "Anti-Cavalry Caltrops",
+          "Razor Caltrops"
+        ]
+      },
+      {
+        "base": "Magicka Detonation",
+        "morphs": [
+          "Inevitable Detonation",
+          "Proximity Detonation"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Alliance War",
+    "line": "Support",
+    "skills": [
+      {
+        "base": "Barrier",
+        "morphs": [
+          "Replenishing Barrier",
+          "Reviving Barrier"
+        ]
+      },
+      {
+        "base": "Siege Shield",
+        "morphs": [
+          "Siege Weapon Shield",
+          "Propelling Shield"
+        ]
+      },
+      {
+        "base": "Purge",
+        "morphs": [
+          "Efficient Purge",
+          "Cleanse"
+        ]
+      },
+      {
+        "base": "Guard",
+        "morphs": [
+          "Mystic Guard",
+          "Stalwart Guard"
+        ]
+      },
+      {
+        "base": "Revealing Flare",
+        "morphs": [
+          "Lingering Flare",
+          "Blinding Flare"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "World",
+    "line": "Vampire",
+    "skills": [
+      {
+        "base": "Blood Scion",
+        "morphs": [
+          "Swarm Scion",
+          "Perfect Scion"
+        ]
+      },
+      {
+        "base": "Eviscerate",
+        "morphs": [
+          "Blood for Blood",
+          "Arterial Burst"
+        ]
+      },
+      {
+        "base": "Blood Frenzy",
+        "morphs": [
+          "Simmering Frenzy",
+          "Sated Fury"
+        ]
+      },
+      {
+        "base": "Vampiric Drain",
+        "morphs": [
+          "Drain Vigor",
+          "Exhilarating Drain"
+        ]
+      },
+      {
+        "base": "Mesmerize",
+        "morphs": [
+          "Hypnosis",
+          "Stupefy"
+        ]
+      },
+      {
+        "base": "Mist Form",
+        "morphs": [
+          "Elusive Mist",
+          "Blood Mist"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "World",
+    "line": "Werewolf",
+    "skills": [
+      {
+        "base": "Werewolf Transformation",
+        "morphs": [
+          "Pack Leader",
+          "Werewolf Berserker"
+        ]
+      },
+      {
+        "base": "Pounce",
+        "morphs": [
+          "Brutal Pounce",
+          "Feral Pounce"
+        ]
+      },
+      {
+        "base": "Hircine's Bounty",
+        "morphs": [
+          "Hircine's Rage",
+          "Hircine's Fortitude"
+        ]
+      },
+      {
+        "base": "Roar",
+        "morphs": [
+          "Ferocious Roar",
+          "Deafening Roar"
+        ]
+      },
+      {
+        "base": "Piercing Howl",
+        "morphs": [
+          "Howl of Despair",
+          "Howl of Agony"
+        ]
+      },
+      {
+        "base": "Infectious Claws",
+        "morphs": [
+          "Claws of Anguish",
+          "Claws of Life"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Class Mastery",
+    "line": "Dragonknight",
+    "skills": [
+      {
+        "base": "Booming Voice",
+        "morphs": []
+      },
+      {
+        "base": "Inexorable Descent",
+        "morphs": []
+      },
+      {
+        "base": "Lead from the Front",
+        "morphs": []
+      },
+      {
+        "base": "Resolute Defense",
+        "morphs": []
+      },
+      {
+        "base": "Wildfire Embers",
+        "morphs": []
+      }
+    ]
+  },
+  {
+    "category": "Class Mastery",
+    "line": "Sorcerer",
+    "skills": [
+      {
+        "base": "Calculated Defense",
+        "morphs": []
+      },
+      {
+        "base": "Conservation of Energy",
+        "morphs": []
+      },
+      {
+        "base": "Font of Power",
+        "morphs": []
+      },
+      {
+        "base": "Sphere of Influence",
+        "morphs": []
+      },
+      {
+        "base": "Static Reverberation",
+        "morphs": []
+      }
+    ]
+  },
+  {
+    "category": "Class Mastery",
+    "line": "Nightblade",
+    "skills": [
+      {
+        "base": "Above and Beyond",
+        "morphs": []
+      },
+      {
+        "base": "An Eye for Exploitation",
+        "morphs": []
+      },
+      {
+        "base": "Cutthroat's Focus",
+        "morphs": []
+      },
+      {
+        "base": "Nocturnal Inspiration",
+        "morphs": []
+      },
+      {
+        "base": "Share the Spoils",
+        "morphs": []
+      }
+    ]
+  },
+  {
+    "category": "Class Mastery",
+    "line": "Templar",
+    "skills": [
+      {
+        "base": "Bastion of Light",
+        "morphs": []
+      },
+      {
+        "base": "Bright Harbinger",
+        "morphs": []
+      },
+      {
+        "base": "Devout Guardian",
+        "morphs": []
+      },
+      {
+        "base": "Judgment's Brand",
+        "morphs": []
+      },
+      {
+        "base": "Steadfast Candescence",
+        "morphs": []
+      }
+    ]
+  },
+  {
+    "category": "Class Mastery",
+    "line": "Warden",
+    "skills": [
+      {
+        "base": "Bountiful Harvest",
+        "morphs": []
+      },
+      {
+        "base": "Glacial Obstinance",
+        "morphs": []
+      },
+      {
+        "base": "Green-Keeper's Hide",
+        "morphs": []
+      },
+      {
+        "base": "Tundra's Maw",
+        "morphs": []
+      },
+      {
+        "base": "Wild Adaptation",
+        "morphs": []
+      }
+    ]
+  },
+  {
+    "category": "Class Mastery",
+    "line": "Necromancer",
+    "skills": [
+      {
+        "base": "Cycle Unending",
+        "morphs": []
+      },
+      {
+        "base": "Malevolent Promise",
+        "morphs": []
+      },
+      {
+        "base": "Nothing Wasted",
+        "morphs": []
+      },
+      {
+        "base": "Pound of Flesh",
+        "morphs": []
+      },
+      {
+        "base": "Veil's Forfeit",
+        "morphs": []
+      }
+    ]
+  },
+  {
+    "category": "Class Mastery",
+    "line": "Arcanist",
+    "skills": [
+      {
+        "base": "Abyssal Emergence",
+        "morphs": []
+      },
+      {
+        "base": "Erudite's Rigor",
+        "morphs": []
+      },
+      {
+        "base": "Fate Realigned",
+        "morphs": []
+      },
+      {
+        "base": "Ink-Scribe's Verve",
+        "morphs": []
+      },
+      {
+        "base": "Unbound Potential",
+        "morphs": []
+      }
+    ]
+  },
+  {
+    "category": "Scribing",
+    "line": "Grimoires",
+    "skills": [
+      {
+        "base": "Banner Bearer",
+        "morphs": []
+      },
+      {
+        "base": "Elemental Explosion",
+        "morphs": []
+      },
+      {
+        "base": "Mender's Bond",
+        "morphs": []
+      },
+      {
+        "base": "Shield Throw",
+        "morphs": []
+      },
+      {
+        "base": "Smash",
+        "morphs": []
+      },
+      {
+        "base": "Soul Burst",
+        "morphs": []
+      },
+      {
+        "base": "Torchbearer",
+        "morphs": []
+      },
+      {
+        "base": "Trample",
+        "morphs": []
+      },
+      {
+        "base": "Traveling Knife",
+        "morphs": []
+      },
+      {
+        "base": "Ulfsild's Contingency",
+        "morphs": []
+      },
+      {
+        "base": "Vault",
+        "morphs": []
+      },
+      {
+        "base": "Wield Soul",
+        "morphs": []
+      }
+    ]
+  }
+]

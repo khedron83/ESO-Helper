@@ -1,0 +1,8 @@
+## Title: WornGear
+## Description: Snapshots worn gear with slot names on login
+## Version: 1
+## APIVersion: 101048 101050
+## DependsOn: LibSets>=0009030 LibAlchemy>=26
+## SavedVariables: WornGearSV WornGearAchievementsSV WornGearSetCollectionsSV
+
+WornGear.lua

@@ -1,0 +1,56 @@
+<GuiXml>
+    <Controls>
+        <TopLevelControl name="WGCMainWindow" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true">
+            <Dimensions x="630" y="480" />
+            <Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" />
+            <OnMoveStop>WGC.MainWindow_OnMoveStop(self)</OnMoveStop>
+            <Controls>
+                <Backdrop name="$(parent)Bg" inherits="ZO_DefaultBackdrop">
+                    <AnchorFill />
+                </Backdrop>
+
+                <Label name="$(parent)Title" font="ZoFontWinT1" text="WornGear Companion" horizontalAlignment="LEFT">
+                    <Dimensions x="300" y="26" />
+                    <Anchor point="TOPLEFT" offsetX="14" offsetY="10" />
+                </Label>
+
+                <Button name="$(parent)Close">
+                    <Dimensions x="22" y="22" />
+                    <Anchor point="TOPRIGHT" offsetX="-6" offsetY="6" />
+                    <Textures normal="EsoUI/Art/Buttons/decline_up.dds" pressed="EsoUI/Art/Buttons/decline_down.dds" mouseOver="EsoUI/Art/Buttons/decline_over.dds" />
+                    <OnClicked>WGC.MainWindow_Toggle()</OnClicked>
+                </Button>
+
+                <Button name="$(parent)CharPrev" font="ZoFontGameBold" text="&lt;" normalColor="FFFFFF">
+                    <Dimensions x="20" y="24" />
+                    <Anchor point="TOPLEFT" offsetX="14" offsetY="42" />
+                    <OnClicked>WGC.MainWindow_CycleChar(-1)</OnClicked>
+                </Button>
+                <Label name="$(parent)CharName" font="ZoFontGameBold" horizontalAlignment="CENTER">
+                    <Dimensions x="200" y="24" />
+                    <Anchor point="LEFT" relativeTo="$(parent)CharPrev" relativePoint="RIGHT" offsetX="4" />
+                </Label>
+                <Button name="$(parent)CharNext" font="ZoFontGameBold" text="&gt;" normalColor="FFFFFF">
+                    <Dimensions x="20" y="24" />
+                    <Anchor point="LEFT" relativeTo="$(parent)CharName" relativePoint="RIGHT" offsetX="4" />
+                    <OnClicked>WGC.MainWindow_CycleChar(1)</OnClicked>
+                </Button>
+
+                <Control name="$(parent)Tabs">
+                    <Dimensions x="110" y="380" />
+                    <Anchor point="TOPLEFT" offsetX="14" offsetY="78" />
+                </Control>
+
+                <Backdrop name="$(parent)ContentBg" inherits="ZO_DefaultBackdrop">
+                    <Dimensions x="480" y="380" />
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)Tabs" relativePoint="TOPRIGHT" offsetX="8" offsetY="0" />
+                </Backdrop>
+
+                <Control name="$(parent)Content">
+                    <Dimensions x="460" y="360" />
+                    <Anchor point="TOPLEFT" relativeTo="$(parent)ContentBg" relativePoint="TOPLEFT" offsetX="10" offsetY="10" />
+                </Control>
+            </Controls>
+        </TopLevelControl>
+    </Controls>
+</GuiXml>

@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+*.spec
+.pytest_cache/
+*.db
+*.db-shm
+*.db-wal
+.env
+
+# ESO addon save-file data (personal, synced from zeus) - not the WornGear/ addon source
+/*.lua

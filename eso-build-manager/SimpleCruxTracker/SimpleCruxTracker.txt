@@ -1,0 +1,7 @@
+## Title: Simple Crux Tracker
+## Description: Small always-on number showing your current Arcanist Crux stacks (0-3), nothing else.
+## Author: khedron83
+## APIVersion: 101050
+## SavedVariables: SimpleCruxTrackerSV
+
+SimpleCruxTracker.lua

@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+.pytest_cache/
+
+# Local env / editor / secrets
+.env
+.claude/settings.local.json
+.idea/
+.vscode/
+*.swp
+
+# SQLite (build-authoring subsystem was removed; a stray db may linger on disk)
+*.db
+*.db-shm
+*.db-wal
+
+# Personal ESO SavedVariables pulled from the game box -- a self-healing cache,
+# re-fetched on the next reload, never source. The WornGear/ addon *source*
+# (Lua under eso-build-manager/WornGear/) IS tracked; these top-level dumps are not.
+/eso-build-manager/*.lua
