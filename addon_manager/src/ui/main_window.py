@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (
     QMainWindow, QTabWidget, QStatusBar, QWidget,
     QMessageBox, QSystemTrayIcon, QMenu,
@@ -24,13 +24,21 @@ _ICON_PATH = Path(__file__).resolve().parent.parent / "resources" / "icon.svg"
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, defer_first_run_prompt: bool = False):
         super().__init__()
         self.config = Config()
         self.setWindowTitle("ESO Helper — Addons")
         self.setMinimumSize(900, 600)
         self._quitting = False
         self._tray: QSystemTrayIcon | None = None
+        # When True, _first_run_check() below still tries to auto-detect the
+        # AddOns dir but won't pop the Settings dialog itself if that fails --
+        # eso-helper/main.py passes this when composing this window with the
+        # viewer's own startup dialog, since a "Sync Server (client only)"
+        # choice there means this machine isn't running the game and doesn't
+        # need an AddOns dir prompt either. The composer calls
+        # prompt_addons_dir_if_needed() itself once it knows the chosen mode.
+        self._defer_first_run_prompt = defer_first_run_prompt
         self._setup_ui()
         self._apply_tray_setting(self.config.tray_enabled)
         self._first_run_check()
@@ -100,12 +108,28 @@ class MainWindow(QMainWindow):
                 self._status.showMessage(
                     "AddOns directory not found — open Settings to configure."
                 )
-                self._open_settings()
+                if not self._defer_first_run_prompt:
+                    # Deferred, not called inline: this runs from __init__ (via
+                    # _setup_ui -> _first_run_check), and dlg.exec() is a
+                    # blocking modal event loop -- calling it synchronously
+                    # here would block construction of this window (and,
+                    # embedded in the composed ESO Helper app, the whole app)
+                    # before it's even shown.
+                    QTimer.singleShot(0, self._open_settings)
                 return
 
         self._installed_tab.refresh()
         # Fetch remote addon list in background so update info is ready immediately
         self._browse_tab.load_addon_list()
+
+    def prompt_addons_dir_if_needed(self):
+        """Deferred counterpart to _first_run_check()'s own auto-popup, for
+        callers that passed defer_first_run_prompt=True -- eso-helper/main.py
+        calls this once it knows the viewer's chosen sync mode, skipping it
+        entirely in "Sync Server" mode (see the comment on that flag in
+        __init__)."""
+        if not self.config.addons_dir:
+            QTimer.singleShot(0, self._open_settings)
 
     def _on_tab_changed(self, index: int):
         if self._tabs.widget(index) is self._backup_tab:

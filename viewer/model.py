@@ -1,17 +1,18 @@
-"""Data model extracted from WornGear saved variables."""
+"""Data model extracted from ESO Helper addon saved variables."""
 from __future__ import annotations
 import time
+import dataclasses
 from dataclasses import dataclass, field
 
 CONSTELLATIONS = ['Craft', 'Warfare', 'Fitness']
 
-# ESO's daily reset is 10:00 UTC (not local midnight — see WornGear.lua's
-# GetLastDailyResetTimestamp()). WornGear only refreshes dailies.dungeonDone/
-# writsDone when the addon actually runs (session snapshot or a live quest-
+# ESO's daily reset is 11:00 UTC (not local midnight — see ESOHelper.lua's
+# GetLastDailyResetTimestamp()). The addon only refreshes dailies.dungeonDone/
+# writsDone when it actually runs (session snapshot or a live quest-
 # complete event), so a character that hasn't logged in since before today's
 # reset still carries yesterday's "done" flags. Mirror the same boundary here
 # so the desktop app doesn't show stale "Done" status for idle characters.
-_DAILY_RESET_HOUR_UTC = 10
+_DAILY_RESET_HOUR_UTC = 11
 
 
 def _last_daily_reset_timestamp(now: float | None = None) -> float:
@@ -58,21 +59,10 @@ class InventoryItem:
 
 
 @dataclass
-class CraftResearch:
-    known: int = 0
-    total: int = 0
-    max_simultaneous: int = 0
-    active: int = 0  # how many research slots are currently occupied
-    next_completion_time: int = 0  # unix timestamp of the soonest active trait finishing, 0 = none active
-
-
-RESEARCH_CRAFTS = ['Blacksmithing', 'Clothier', 'Woodworking', 'Jewelry', 'Alchemy', 'Enchanting']
-
-
-@dataclass
 class Character:
     name: str
     account: str = ''  # ESO @handle this character belongs to, e.g. "@khedron83"
+    server: str = ''  # 'NA' or 'EU' megaserver -- see extract_from_wg
     class_name: str = ''
     race_name: str = ''
     faction_name: str = ''
@@ -125,21 +115,36 @@ class Character:
     daily_horse_training_done: bool = False
     daily_remains_silent_done: bool = False
     daily_pledges_count: int = 0  # 0-3 Undaunted Pledges completed since the last daily reset
-    mount_next_trainable_time: int = 0  # unix timestamp riding training is next available, 0/past = ready now
-    research: dict[str, CraftResearch] = field(default_factory=dict)  # craft name -> CraftResearch
     # slot name -> {name, setName, quality, enchant, weight, trait} -- what's
     # directly worn right now, independent of any saved build (see
-    # WornGear.lua's ReadWornGear()).
+    # ESOHelper.lua's ReadWornGear()).
     equipped_gear: dict[str, dict] = field(default_factory=dict)
-    # WornGear-tracked named loadouts ("DPS", "Tank", "Healer", ...), each shaped
-    # like exporter.export_build_dict()'s output so both desktop and mobile can
-    # render them with the exact same build-sheet code as a saved Build.
-    gear_loadouts: list[dict] = field(default_factory=list)
+    # ESO Helper-tracked named loadouts ("DPS", "Tank", "Healer", ...) in the
+    # same raw {slot_name: {name, setName, link}} shape extract_worn_gear()
+    # returns per character -- carried on Character (rather than kept as a
+    # separate lua_data-only structure) specifically so it rides along
+    # through push_all()/character_from_dict() and is available in "Sync
+    # Server" mode's BuildsTab, which otherwise has no worn-gear source at
+    # all (see main.py's _reload()).
+    gear_loadouts: dict[str, dict] = field(default_factory=dict)
 
 
 def extract_from_wg(lua_data: dict) -> list[Character]:
-    """Build Character list from WornGear's __char__ sections."""
-    sv = lua_data.get('WornGearSV', {})
+    """Build Character list from the ESO Helper addon's __char__ sections.
+
+    Each character's `server` ('NA'/'EU'/'') comes straight from
+    bio.server -- the addon's own GetMegaserver() (GetWorldName()-based)
+    ground truth, written at snapshot time. Earlier this app instead
+    guessed the megaserver from the local SavedVariables install path
+    (".../live/" vs ".../liveeu/"), which was wrong: a Steam install has a
+    single "live" folder shared by both megaservers, so that path-based
+    guess collapsed NA and EU into one value (confirmed 2026-09-17 -- a
+    single account's "live" save data contained both NA and EU
+    characters). A character snapshotted before this fix has no
+    bio.server at all and defaults to ''."""
+    # Pre-rename key (this addon was "WornGear"). Fall back for anyone still
+    # holding an old-format WornGear.lua; never written, only read.
+    sv = lua_data.get('ESOHelperSV', {}) or lua_data.get('WornGearSV', {})
     chars = []
     for char_name, char_data in sv.items():
         if not isinstance(char_data, dict):
@@ -151,96 +156,8 @@ def extract_from_wg(lua_data: dict) -> list[Character]:
     return sorted(chars, key=lambda c: c.name)
 
 
-# Gear slot names as WornGear reports them vs. GEAR_SLOTS constant used elsewhere
-_SLOT_ALIAS = {'Shoulders': 'Shoulder'}
-
 # char_data sibling keys that aren't named loadouts
 _LOADOUT_SKIP_KEYS = {'__char__', 'dailyTracking'}
-
-
-def _parse_wg_loadout(char_class: str, name: str, raw: dict) -> dict:
-    """Turn one WornGear-tracked loadout ('DPS', 'Tank', ...) into a dict shaped
-    like exporter.export_build_dict()'s output, so it can be rendered/synced the
-    same way as a regular saved Build."""
-    attrs = raw.get('attributes', {}) if isinstance(raw, dict) else {}
-    subclasses = raw.get('subclasses') or []
-    masteries = raw.get('masteries') or []
-    cp = raw.get('cp', {}) if isinstance(raw, dict) else {}
-
-    cp_slots: list[str] = []
-    for discipline in ('Craft', 'Warfare', 'Fitness'):
-        val = cp.get(discipline, {}) if isinstance(cp, dict) else {}
-        stars = list(val.keys())[:4] if isinstance(val, dict) else []
-        stars += [''] * (4 - len(stars))
-        cp_slots.extend(stars)
-
-    skills = []
-    raw_skills = raw.get('skills', {}) if isinstance(raw, dict) else {}
-    for bar_idx, bar_name in enumerate(('Front Bar', 'Back Bar')):
-        bar = raw_skills.get(bar_name, []) if isinstance(raw_skills, dict) else []
-        for slot_idx, item in enumerate(bar[:6] if isinstance(bar, list) else []):
-            skill_name = item.get('name', item) if isinstance(item, dict) else item
-            if skill_name:
-                skills.append({'bar': bar_idx, 'slot': slot_idx, 'name': skill_name})
-
-    gear = []
-    raw_gear = raw.get('gear', raw) if isinstance(raw, dict) else {}
-    if isinstance(raw_gear, dict):
-        for slot, info in raw_gear.items():
-            if not isinstance(info, dict):
-                continue
-            gear.append({
-                'slot': _SLOT_ALIAS.get(slot, slot),
-                'set_name': info.get('setName', ''),
-                'quality': info.get('quality', 'Epic'),
-                'enchant': (info.get('enchant', '') or '').removesuffix(' Enchantment'),
-                'weight': info.get('weight', ''),
-                'trait': info.get('trait', ''),
-            })
-
-    return {
-        'name': name,
-        'eso_class': char_class,
-        'subclass_1': subclasses[0] if len(subclasses) > 0 else '',
-        'subclass_2': subclasses[1] if len(subclasses) > 1 else '',
-        'role': '', 'content': '', 'game_patch': '', 'source': '',
-        'mundus_stone': '', 'food_buff': '',
-        'attribute_health': attrs.get('health', 0),
-        'attribute_magicka': attrs.get('magicka', 0),
-        'attribute_stamina': attrs.get('stamina', 0),
-        'champion_points': '',
-        'cp_slots': cp_slots,
-        'class_masteries': masteries,
-        'gear_pages': ['Main'],
-        'notes': '',
-        'skills': skills,
-        'gear': gear,
-    }
-
-
-def _parse_wg_research(raw: dict) -> dict[str, CraftResearch]:
-    result = {}
-    for craft_name, craft_raw in (raw or {}).items():
-        if not isinstance(craft_raw, dict):
-            continue
-        active = craft_raw.get('active', 0)
-        # Older addon versions (before the research tracking was simplified)
-        # stored 'active' as a table of {line, trait, completesAt} entries
-        # instead of a plain count -- tolerate that shape from already-synced
-        # save data until it's overwritten by a fresh snapshot. An empty Lua
-        # table parses as a dict ({}) rather than a list (parser.py only
-        # converts non-empty sequential-int-keyed tables), so both container
-        # types have to be handled here, not just list.
-        if isinstance(active, (list, dict)):
-            active = len(active)
-        result[craft_name] = CraftResearch(
-            known=craft_raw.get('known', 0),
-            total=craft_raw.get('total', 0),
-            max_simultaneous=craft_raw.get('maxSimultaneous', 0),
-            active=active,
-            next_completion_time=craft_raw.get('nextCompletionTime', 0) or 0,
-        )
-    return result
 
 
 def _parse_wg_char(char_name: str, c: dict, char_data: dict | None = None) -> Character:
@@ -263,7 +180,6 @@ def _parse_wg_char(char_name: str, c: dict, char_data: dict | None = None) -> Ch
     cp_spent = cp_unspent = 0
     constellations = []
     disciplines = champ.get('disciplines', {}) if isinstance(champ, dict) else {}
-    earned = champ.get('earned', 0) if isinstance(champ, dict) else 0
     cp_unspent = champ.get('unspent', 0) if isinstance(champ, dict) else 0
     cp_spent   = champ.get('spent', 0) if isinstance(champ, dict) else 0
     for disc_name in CONSTELLATIONS:
@@ -282,13 +198,14 @@ def _parse_wg_char(char_name: str, c: dict, char_data: dict | None = None) -> Ch
     # Remains-Silent (the "Shadowy Supplier") only appears once a character has
     # unlocked the Dark Brotherhood passive of that name, at Dark Brotherhood
     # rank 4 -- below that the addon's loot-id-based done-tracking (see
-    # WornGear.lua's ReadRemainsSilentStatus) can still false-positive off an
+    # ESOHelper.lua's ReadRemainsSilentStatus) can still false-positive off an
     # unrelated item match, so gate it here regardless of what the addon reported.
     _db_rank = next((s.rank for s in skills_guild_lines if s.name == 'Dark Brotherhood'), 0)
 
     char = Character(
         name=bio.get('name', char_name),
         account=bio.get('account', ''),
+        server=bio.get('server', ''),
         class_name=bio.get('class', ''),
         race_name=bio.get('race', ''),
         faction_name=bio.get('alliance', ''),
@@ -338,31 +255,28 @@ def _parse_wg_char(char_name: str, c: dict, char_data: dict | None = None) -> Ch
         inventory=items,
         daily_dungeon_done=(dailies.get('dungeonDone', False) if isinstance(dailies, dict) else False) and not stale_dailies,
         daily_writs_done=(dailies.get('writsDone', False) if isinstance(dailies, dict) else False) and not stale_dailies,
+        # The addon no longer tracks a daily-reset "trained today" flag or a
+        # training-cooldown timer (2026-09-12 strip) -- riding capped at 60/60/60
+        # (matching the "/60" the app already shows) is the only signal left that
+        # a character has nothing more to gain from training.
         daily_horse_training_done=(
-            ((dailies.get('horseTrainingDone', False) if isinstance(dailies, dict) else False) and not stale_dailies)
-            or (mnt.get('speed', 0) >= _MOUNT_STAT_MAX and mnt.get('stamina', 0) >= _MOUNT_STAT_MAX
-                and mnt.get('capacity', 0) >= _MOUNT_STAT_MAX)
+            mnt.get('speed', 0) >= _MOUNT_STAT_MAX and mnt.get('stamina', 0) >= _MOUNT_STAT_MAX
+            and mnt.get('capacity', 0) >= _MOUNT_STAT_MAX
         ),
         daily_remains_silent_done=(dailies.get('remainsSilentDone', False) if isinstance(dailies, dict) else False) and not stale_dailies and _db_rank >= 4,
         daily_pledges_count=(
             0 if stale_dailies else
             (dailies.get('pledgesCompleted', {}).get('count', 0) if isinstance(dailies, dict) else 0)
         ),
-        mount_next_trainable_time=mnt.get('nextTrainableTime', 0) or 0,
-        research=_parse_wg_research(c.get('research', {})),
         equipped_gear=c.get('equippedGear', {}) if isinstance(c.get('equippedGear'), dict) else {},
     )
 
     if char_data:
-        char.gear_loadouts = sorted(
-            (
-                _parse_wg_loadout(char.class_name, k, v)
-                for k, v in char_data.items()
-                if isinstance(v, dict) and k not in _LOADOUT_SKIP_KEYS
-                and not (k.startswith('__') and k.endswith('__'))
-            ),
-            key=lambda ld: ld['name'],
-        )
+        char.gear_loadouts = {
+            k: v for k, v in char_data.items()
+            if isinstance(v, dict) and k not in _LOADOUT_SKIP_KEYS
+            and not (k.startswith('__') and k.endswith('__'))
+        }
 
     return char
 
@@ -386,9 +300,41 @@ def _skill_lines(raw) -> list[SkillLine]:
     )
 
 
+_CHARACTER_SKILL_LIST_FIELDS = (
+    'skills_class', 'skills_weapon', 'skills_armor', 'skills_guild',
+    'skills_ava', 'skills_world', 'skills_racial', 'skills_craft',
+)
+
+
+def character_from_dict(d: dict) -> Character:
+    """Reconstruct a Character from the sync server's GET /characters response
+    (a dataclasses.asdict()-shaped dict some producer PUT there). Unknown keys
+    are dropped rather than raising -- the store may hold data pushed by an
+    older/newer version of this app's Character shape than this one (e.g. a
+    stale 'research' field from before the 2026-09-12 dailies rework)."""
+    known = {f.name for f in dataclasses.fields(Character)}
+    kwargs = {k: v for k, v in d.items() if k in known}
+    for key in _CHARACTER_SKILL_LIST_FIELDS:
+        if key in kwargs:
+            kwargs[key] = [SkillLine(name=s.get('name', ''), rank=s.get('rank', 0))
+                            for s in kwargs[key] if isinstance(s, dict)]
+    if 'constellations' in kwargs:
+        kwargs['constellations'] = [
+            Constellation(name=c.get('name', ''), spent=c.get('spent', 0),
+                          unspent=c.get('unspent', 0), skills=c.get('skills', []))
+            for c in kwargs['constellations'] if isinstance(c, dict)
+        ]
+    if 'inventory' in kwargs:
+        kwargs['inventory'] = [
+            InventoryItem(name=i.get('name', ''), count=i.get('count', 1), bag=i.get('bag', ''))
+            for i in kwargs['inventory'] if isinstance(i, dict)
+        ]
+    return Character(**kwargs)
+
+
 def extract_worn_gear(lua_data: dict) -> dict[str, dict[str, dict[str, dict]]]:
-    """Return {char_name: {build_name: {slot_name: {name, setName, link}}}} from WornGear addon."""
-    return lua_data.get('WornGearSV', {})
+    """Return {char_name: {build_name: {slot_name: {name, setName, link}}}} from the ESO Helper addon."""
+    return lua_data.get('ESOHelperSV', {}) or lua_data.get('WornGearSV', {})
 
 
 @dataclass
@@ -420,8 +366,11 @@ class Achievement:
 class AccountAchievements:
     """Achievement points/completion are account-wide in ESO (shared across every
     character on the account), so this is one record per @account handle, not
-    per Character -- see WornGear.lua's WornGearAchievementsSV."""
+    per Character -- see ESOHelper.lua's ESOHelperAchievementsSV. Also
+    per-megaserver: NA/EU progress is independent for the same @account
+    handle -- see Character.server."""
     account: str
+    server: str = ''
     earned_points: int = 0
     total_points: int = 0
     last_updated: int = 0
@@ -429,47 +378,91 @@ class AccountAchievements:
     achievements: list[Achievement] = field(default_factory=list)
 
 
+def _parse_achievement_entry(account: str, server: str, raw: dict) -> AccountAchievements:
+    categories = []
+    for cat in raw.get('categories', []) if isinstance(raw.get('categories'), list) else []:
+        if not isinstance(cat, dict):
+            continue
+        subcats = [
+            AchievementSubcategory(
+                name=s.get('name', ''), earned_points=s.get('earnedPoints', 0),
+                total_points=s.get('totalPoints', 0),
+            )
+            for s in (cat.get('subcategories', []) if isinstance(cat.get('subcategories'), list) else [])
+            if isinstance(s, dict)
+        ]
+        categories.append(AchievementCategory(
+            name=cat.get('name', ''), earned_points=cat.get('earnedPoints', 0),
+            total_points=cat.get('totalPoints', 0), subcategories=subcats,
+        ))
+    achievements = [
+        Achievement(
+            id=a.get('id', 0), name=a.get('name', ''), points=a.get('points', 0),
+            completed=a.get('completed', False), category=a.get('category', ''),
+            subcategory=a.get('subcategory', ''),
+        )
+        for a in (raw.get('achievements', []) if isinstance(raw.get('achievements'), list) else [])
+        if isinstance(a, dict)
+    ]
+    return AccountAchievements(
+        account=account, server=server, earned_points=raw.get('earnedPoints', 0),
+        total_points=raw.get('totalPoints', 0), last_updated=raw.get('lastUpdated', 0),
+        categories=categories, achievements=achievements,
+    )
+
+
 def extract_achievements(lua_data: dict) -> list[AccountAchievements]:
-    """Build AccountAchievements list from WornGear's WornGearAchievementsSV."""
-    sv = lua_data.get('WornGearAchievementsSV', {})
+    """Build AccountAchievements list from the addon's ESOHelperAchievementsSV,
+    keyed account -> server -> snapshot (ESOHelperAchievementsSV[account][server]
+    = ReadAchievements()) since the same @account handle has independent
+    progress on each megaserver -- see ESOHelper.lua's GetMegaserver(). A
+    pre-fix save still has the old flat account -> snapshot shape (no
+    per-server nesting, since it predates ESOHelper.lua ever calling
+    GetWorldName()); detected by the absence of an 'earnedPoints' key one
+    level down and treated as a single server='' entry."""
+    sv = lua_data.get('ESOHelperAchievementsSV', {}) or lua_data.get('WornGearAchievementsSV', {})
     result = []
     for account, raw in sv.items():
         if not isinstance(raw, dict):
             continue
-        categories = []
-        for cat in raw.get('categories', []) if isinstance(raw.get('categories'), list) else []:
-            if not isinstance(cat, dict):
-                continue
-            subcats = [
-                AchievementSubcategory(
-                    name=s.get('name', ''), earned_points=s.get('earnedPoints', 0),
-                    total_points=s.get('totalPoints', 0),
-                )
-                for s in (cat.get('subcategories', []) if isinstance(cat.get('subcategories'), list) else [])
-                if isinstance(s, dict)
-            ]
-            categories.append(AchievementCategory(
-                name=cat.get('name', ''), earned_points=cat.get('earnedPoints', 0),
-                total_points=cat.get('totalPoints', 0), subcategories=subcats,
-            ))
-        achievements = [
-            Achievement(
-                id=a.get('id', 0), name=a.get('name', ''), points=a.get('points', 0),
-                completed=a.get('completed', False), category=a.get('category', ''),
-                subcategory=a.get('subcategory', ''),
-            )
-            for a in (raw.get('achievements', []) if isinstance(raw.get('achievements'), list) else [])
-            if isinstance(a, dict)
-        ]
-        result.append(AccountAchievements(
-            account=account, earned_points=raw.get('earnedPoints', 0),
-            total_points=raw.get('totalPoints', 0), last_updated=raw.get('lastUpdated', 0),
-            categories=categories, achievements=achievements,
-        ))
-    return sorted(result, key=lambda a: a.account)
+        if 'earnedPoints' in raw:
+            result.append(_parse_achievement_entry(account, '', raw))
+            continue
+        for server, snapshot in raw.items():
+            if isinstance(snapshot, dict):
+                result.append(_parse_achievement_entry(account, server, snapshot))
+    return sorted(result, key=lambda a: (a.account, a.server))
 
 
-# LibSets' own setType (WornGear.lua's LIBSETS_TYPE_NAME) mapped down to the app's
+def achievements_from_dict(d: dict) -> AccountAchievements:
+    """Reconstruct an AccountAchievements from the sync server's GET
+    /achievements response -- see character_from_dict for why unknown keys
+    are dropped rather than raising."""
+    known = {f.name for f in dataclasses.fields(AccountAchievements)}
+    kwargs = {k: v for k, v in d.items() if k in known}
+    kwargs['categories'] = [
+        AchievementCategory(
+            name=c.get('name', ''), earned_points=c.get('earned_points', 0),
+            total_points=c.get('total_points', 0),
+            subcategories=[
+                AchievementSubcategory(name=s.get('name', ''),
+                                        earned_points=s.get('earned_points', 0),
+                                        total_points=s.get('total_points', 0))
+                for s in (c.get('subcategories') or []) if isinstance(s, dict)
+            ],
+        )
+        for c in (kwargs.get('categories') or []) if isinstance(c, dict)
+    ]
+    kwargs['achievements'] = [
+        Achievement(id=a.get('id', 0), name=a.get('name', ''), points=a.get('points', 0),
+                    completed=a.get('completed', False), category=a.get('category', ''),
+                    subcategory=a.get('subcategory', ''))
+        for a in (kwargs.get('achievements') or []) if isinstance(a, dict)
+    ]
+    return AccountAchievements(**kwargs)
+
+
+# LibSets' own setType (ESOHelper.lua's LIBSETS_TYPE_NAME) mapped down to the app's
 # coarse Dungeon/Overland/Trial/PVP/Arena/Monster/Mythic/Class/Crafted/Other buckets.
 # LibSets already classifies every set id correctly (including Mythic and Class,
 # which the game's own API can't distinguish), so this is a flat lookup instead of
@@ -516,28 +509,57 @@ class SetCollectionEntry:
 class AccountSetCollections:
     """Which set pieces have ever been discovered (ESO's own "Item Set Collections"
     system -- the one behind reconstructing a found piece for gold) is account-wide,
-    same as achievements -- see WornGear.lua's WornGearSetCollectionsSV."""
+    same as achievements -- see ESOHelper.lua's ESOHelperSetCollectionsSV. Also
+    per-megaserver like AccountAchievements -- see Character.server."""
     account: str
+    server: str = ''
     last_updated: int = 0
     sets: list[SetCollectionEntry] = field(default_factory=list)
 
 
+def _parse_set_collection_entry(account: str, server: str, raw: dict) -> AccountSetCollections:
+    sets = [
+        SetCollectionEntry(
+            id=s.get('id', 0), name=s.get('name', ''), category=s.get('category', ''),
+            set_type=s.get('setType', ''), total=s.get('total', 0), unlocked=s.get('unlocked', 0),
+        )
+        for s in (raw.get('sets', []) if isinstance(raw.get('sets'), list) else [])
+        if isinstance(s, dict)
+    ]
+    return AccountSetCollections(
+        account=account, server=server, last_updated=raw.get('lastUpdated', 0), sets=sets,
+    )
+
+
 def extract_set_collections(lua_data: dict) -> list[AccountSetCollections]:
-    """Build AccountSetCollections list from WornGear's WornGearSetCollectionsSV."""
-    sv = lua_data.get('WornGearSetCollectionsSV', {})
+    """Build AccountSetCollections list from the addon's ESOHelperSetCollectionsSV,
+    keyed account -> server -> snapshot, same reasoning and same pre-fix flat-shape
+    fallback as extract_achievements (detected by the absence of a 'sets' key one
+    level down, since a real per-server snapshot always has one, even if empty)."""
+    sv = lua_data.get('ESOHelperSetCollectionsSV', {}) or lua_data.get('WornGearSetCollectionsSV', {})
     result = []
     for account, raw in sv.items():
         if not isinstance(raw, dict):
             continue
-        sets = [
-            SetCollectionEntry(
-                id=s.get('id', 0), name=s.get('name', ''), category=s.get('category', ''),
-                set_type=s.get('setType', ''), total=s.get('total', 0), unlocked=s.get('unlocked', 0),
-            )
-            for s in (raw.get('sets', []) if isinstance(raw.get('sets'), list) else [])
-            if isinstance(s, dict)
-        ]
-        result.append(AccountSetCollections(
-            account=account, last_updated=raw.get('lastUpdated', 0), sets=sets,
-        ))
-    return sorted(result, key=lambda a: a.account)
+        if 'sets' in raw:
+            result.append(_parse_set_collection_entry(account, '', raw))
+            continue
+        for server, snapshot in raw.items():
+            if isinstance(snapshot, dict):
+                result.append(_parse_set_collection_entry(account, server, snapshot))
+    return sorted(result, key=lambda a: (a.account, a.server))
+
+
+def set_collections_from_dict(d: dict) -> AccountSetCollections:
+    """Reconstruct an AccountSetCollections from the sync server's GET
+    /set-collections response -- see character_from_dict for why unknown keys
+    are dropped rather than raising."""
+    known = {f.name for f in dataclasses.fields(AccountSetCollections)}
+    kwargs = {k: v for k, v in d.items() if k in known}
+    kwargs['sets'] = [
+        SetCollectionEntry(id=s.get('id', 0), name=s.get('name', ''), category=s.get('category', ''),
+                            set_type=s.get('set_type', ''), total=s.get('total', 0),
+                            unlocked=s.get('unlocked', 0))
+        for s in (kwargs.get('sets') or []) if isinstance(s, dict)
+    ]
+    return AccountSetCollections(**kwargs)

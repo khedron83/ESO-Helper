@@ -1,10 +1,13 @@
 from PySide6.QtCore import QSettings, Qt
 from PySide6.QtWidgets import (
+    QCheckBox,
     QDialog,
     QDialogButtonBox,
+    QFormLayout,
     QGroupBox,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QListWidget,
     QListWidgetItem,
     QPushButton,
@@ -13,6 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 from eso_viewer import dailies
+from eso_viewer.sync import config as sync_config
 
 # Distinct accent per group: QGroupBox::title selector only, so it doesn't
 # cascade into child widgets.
@@ -66,23 +70,61 @@ class SettingsDialog(QDialog):
         sync_layout = QVBoxLayout(group)
         sync_layout.setSpacing(6)
 
-        self._remote_radio = QRadioButton("Remote Host (SSH)")
         self._this_pc_radio = QRadioButton("This PC")
-        sync_layout.addWidget(self._remote_radio)
+        self._server_radio = QRadioButton("Sync Server")
+        self._this_pc_radio.toggled.connect(self._update_server_fields_enabled)
+        self._server_radio.toggled.connect(self._update_server_fields_enabled)
         sync_layout.addWidget(self._this_pc_radio)
+        sync_layout.addWidget(self._server_radio)
 
         note = QLabel(
-            "<small>Remote Host syncs save files over the network via scp, from "
-            "whatever host/path is configured in "
-            "<code>~/.config/eso-helper/sync.json</code>. Use This PC when "
-            "the game and build manager are running on the same machine (e.g. "
-            "streaming from this PC) to read save files directly from disk "
-            "instead.</small>"
+            "<small>Use This PC when the game and build manager are running "
+            "on the same machine (e.g. streaming from this PC) to read save "
+            "files directly from disk. Sync Server instead pulls characters/"
+            "achievements/set collections straight from a standalone sync "
+            "server below — no local save file parsed at all, so Armory "
+            "loadouts aren't available in this mode.</small>"
         )
         note.setWordWrap(True)
         sync_layout.addWidget(note)
 
+        # For a machine that runs the game AND wants other machines' "Sync
+        # Server" clients to see fresh data (e.g. zeus) -- reads locally as
+        # normal, and additionally pushes that same data up to the server on
+        # every reload. Only meaningful in This PC mode: there's no local
+        # data to push while this window is itself just a Sync Server client.
+        self._push_checkbox = QCheckBox("Also push this PC's data to the Sync Server")
+        self._push_checkbox.setToolTip(
+            "For the machine that runs the game (e.g. zeus), if you also want "
+            "other machines running in \"Sync Server\" mode to see fresh data. "
+            "Pushes characters/achievements/set collections to the server "
+            "below after every local reload."
+        )
+        self._push_checkbox.toggled.connect(self._update_server_fields_enabled)
+        push_row = QHBoxLayout()
+        push_row.setContentsMargins(20, 0, 0, 0)
+        push_row.addWidget(self._push_checkbox)
+        sync_layout.addLayout(push_row)
+
+        server_form = QFormLayout()
+        server_form.setContentsMargins(20, 4, 0, 0)
+        self._server_url_edit = QLineEdit()
+        self._server_url_edit.setPlaceholderText("http://192.168.1.x:8091")
+        server_form.addRow("Server address:", self._server_url_edit)
+        self._server_token_edit = QLineEdit()
+        self._server_token_edit.setPlaceholderText("(leave blank if the server has no auth)")
+        server_form.addRow("Token:", self._server_token_edit)
+        sync_layout.addLayout(server_form)
+
         return group
+
+    def _update_server_fields_enabled(self):
+        self._push_checkbox.setEnabled(self._this_pc_radio.isChecked())
+        needs_server = self._server_radio.isChecked() or (
+            self._this_pc_radio.isChecked() and self._push_checkbox.isChecked()
+        )
+        self._server_url_edit.setEnabled(needs_server)
+        self._server_token_edit.setEnabled(needs_server)
 
     def _build_dailies_group(self) -> QGroupBox:
         group = QGroupBox("Untracked Dailies")
@@ -150,11 +192,23 @@ class SettingsDialog(QDialog):
     def _load(self):
         s = QSettings()
 
-        mode = s.value("sync/mode", "remote")
-        self._this_pc_radio.setChecked(mode == "this_pc")
-        self._remote_radio.setChecked(mode != "this_pc")
+        mode = s.value("sync/mode", "this_pc")
+        self._server_radio.setChecked(mode == "server")
+        self._this_pc_radio.setChecked(mode != "server")
+        self._push_checkbox.setChecked(bool(s.value("sync/push_enabled", False, type=bool)))
+        self._update_server_fields_enabled()
+
+        cfg = sync_config.load()
+        self._server_url_edit.setText(cfg.get("server_url", ""))
+        self._server_token_edit.setText(cfg.get("server_token", ""))
 
     def _save_and_accept(self):
         s = QSettings()
-        s.setValue("sync/mode", "this_pc" if self._this_pc_radio.isChecked() else "remote")
+        mode = "server" if self._server_radio.isChecked() else "this_pc"
+        s.setValue("sync/mode", mode)
+        s.setValue("sync/push_enabled", self._this_pc_radio.isChecked() and self._push_checkbox.isChecked())
+        sync_config.save({
+            "server_url": self._server_url_edit.text().strip(),
+            "server_token": self._server_token_edit.text().strip(),
+        })
         self.accept()

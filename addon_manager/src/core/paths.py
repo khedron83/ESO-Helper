@@ -44,9 +44,8 @@ def detect_addons_dir() -> Optional[Path]:
     Returns None if nothing is found (user will be prompted in settings).
     """
     if sys.platform == "win32":
-        docs = Path.home() / "Documents"
-        candidate = docs / "Elder Scrolls Online/live/AddOns"
-        return candidate if candidate.exists() else docs / "Elder Scrolls Online/live/AddOns"
+        candidate = Path.home() / "Documents/Elder Scrolls Online/live/AddOns"
+        return candidate if candidate.exists() else None
 
     # Linux / Steam Deck: try Proton prefix first, then native
     proton = _find_proton_addons()

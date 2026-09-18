@@ -39,7 +39,7 @@ CP_TREE_COLORS = {
 }
 
 CLASS_SKILL_LINES: dict[str, list[str]] = {
-    "Arcanist":    ["Apocrypha", "Herald of the Tome", "Soldier of Apocrypha"],
+    "Arcanist":    ["Herald of the Tome", "Curative Runeforms", "Soldier of Apocrypha"],
     "Dragonknight":["Ardent Flame", "Draconic Power", "Earthen Heart"],
     "Necromancer": ["Bone Tyrant", "Grave Lord", "Living Death"],
     "Nightblade":  ["Assassination", "Shadow", "Siphoning"],

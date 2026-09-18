@@ -12,6 +12,7 @@ class definitions get imported.
 """
 import importlib.util
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -23,7 +24,11 @@ sys.path.insert(0, str(_DIR / "viewer"))
 # autostart (the normal way this app runs) there's no terminal to catch a
 # traceback, so an uncaught exception otherwise vanishes with no trace of
 # what happened. Also mirrored to stderr for when it *is* run from a shell.
-_LOG_DIR = Path.home() / ".local" / "share" / "eso-helper"
+# Same sys.platform == "win32" -> %APPDATA% check as addon_manager/src/core/config.py
+# and viewer/eso_viewer/paths.py -- inlined rather than imported from either, since
+# this composition layer deliberately doesn't reach into either sub-app's internals.
+_LOG_BASE = Path(os.environ.get("APPDATA", Path.home())) if sys.platform == "win32" else Path.home() / ".local" / "share"
+_LOG_DIR = _LOG_BASE / "eso-helper"
 _LOG_DIR.mkdir(parents=True, exist_ok=True)
 _LOG_FILE = _LOG_DIR / "eso-helper.log"
 logging.basicConfig(
@@ -109,8 +114,20 @@ class ESOHelperWindow(QMainWindow):
         # extra_tab hook, rather than the two sub-apps sitting as two
         # top-level tabs one level up -- one row of 5 peer tabs reads more
         # like one app than a mode switch between two.
-        self._addon_manager_win = AddonManagerWindow()
+        #
+        # defer_first_run_prompt=True: the addon manager would otherwise pop
+        # its own "AddOns directory not found" Settings dialog right on top
+        # of the viewer's startup dialog (see viewer_main.MainWindow.__init__
+        # below) on any machine without a real ESO install. Whether that
+        # prompt makes sense at all depends on which sync mode gets chosen in
+        # that dialog -- decided below, once it's answered.
+        self._addon_manager_win = AddonManagerWindow(defer_first_run_prompt=True)
         self._viewer_win = viewer_main.MainWindow(extra_tab=(self._addon_manager_win, "Addons"))
+        # "Sync Server (client only)" means this machine isn't running the
+        # game, so there's no local AddOns dir to manage either -- only ask
+        # for one when "Read Local Data" (This PC) was chosen.
+        if QSettings().value("sync/mode", "this_pc") != "server":
+            self._addon_manager_win.prompt_addons_dir_if_needed()
         # Each sub-app manages its own tray icon assuming it's a standalone
         # top-level window; embedded here that would mean two tray icons for
         # what's supposed to read as one app — hide both and give the merged

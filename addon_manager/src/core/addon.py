@@ -96,8 +96,7 @@ def addon_from_disk(folder: Path) -> Optional[Addon]:
 
     depends = _parse_deps(meta.get("DependsOn", ""))
     depends += _parse_deps(meta.get("PCDependsOn", ""))
-    seen: set[str] = set()
-    unique_deps = [d for d in depends if not (seen.add(d) or d in seen - {d})]
+    unique_deps = list(dict.fromkeys(depends))
 
     sidecar = _read_sidecar(folder)
 

@@ -5,12 +5,13 @@ state-file pattern as sync/addon.py's addon_sync_state.json.
 """
 import datetime
 import json
-from pathlib import Path
 
-_HISTORY_FILE = Path.home() / '.local/share/eso-helper/gold_history.json'
+from eso_viewer.paths import data_dir
+
+_HISTORY_FILE = data_dir() / 'eso-helper' / 'gold_history.json'
 # Pre-rename path (this app was "ESO Build Manager"). Read as a one-time
 # migration source if the new file doesn't exist yet; never written to.
-_LEGACY_HISTORY_FILE = Path.home() / '.local/share/eso-build-manager/gold_history.json'
+_LEGACY_HISTORY_FILE = data_dir() / 'eso-build-manager' / 'gold_history.json'
 _MAX_AGE_SECONDS = 7 * 24 * 3600  # a week of samples is plenty for a 24h lookback
 _RESET_HOUR_UTC = 11  # ESO's daily server reset
 

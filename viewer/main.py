@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """ESO Helper Viewer — character/activity/loadout viewer for Elder Scrolls Online."""
-import os, sys, subprocess, shutil, time
+import logging, os, sys, shutil, time
 from datetime import datetime
 
-from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, QRect, QSettings, QSortFilterProxyModel, QTimer, Signal, QFileSystemWatcher
+from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, QRect, QSettings, QSortFilterProxyModel, QThread, QTimer, Signal, QFileSystemWatcher
 from PySide6.QtGui import QAction, QColor, QFont, QPainter, QPixmap, QIcon
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtWidgets import (
@@ -29,9 +29,12 @@ _SCRIBING_FALLBACK_URL = skill_icon_url("Ulfsild's Contingency")
 import json
 import parser as lua_parser
 import model
+from eso_viewer.sync import server as sync_server
+from eso_viewer.sync import config as sync_config
+from eso_viewer.sync import events as sync_events
 
 _DIR        = os.path.dirname(os.path.abspath(__file__))
-WORN_FILE     = os.path.join(_DIR, 'WornGear.lua')
+WORN_FILE     = os.path.join(_DIR, 'ESOHelper.lua')
 # Shared with the composed app now -- lives at the repo-root packaging/ dir
 # since there's one icon for one app, not a per-sub-app one anymore.
 TRAY_ICON_FILE = os.path.join(_DIR, '..', 'packaging', 'eso-helper.svg')
@@ -42,59 +45,36 @@ TRAY_ICON_FILE = os.path.join(_DIR, '..', 'packaging', 'eso-helper.svg')
 # coalesces into one reload instead of one per file.
 SAVE_CHANGE_DEBOUNCE_MS = 8_000
 
-_SYNC_FILES = ['WornGear.lua']
+_SYNC_FILES = ['ESOHelper.lua']
 
-# Which machine to pull WornGear.lua from, and where it lives there -- kept
-# out of source entirely (not just out of the Settings UI), since this is a
-# private LAN hostname/path and this repo may go public someday. Any SSH-
-# reachable host works, not any one machine in particular -- read from
-# ~/.config/eso-helper/sync.json, e.g.:
-#   {"host": "my-gaming-pc", "remote_dir": "/path/to/.../SavedVariables"}
-# "This PC" mode (see settings_dialog.py) only needs remote_dir (it's a local
-# copy, not scp) and ignores host entirely.
-_SYNC_CONFIG_FILE = os.path.expanduser('~/.config/eso-helper/sync.json')
-# Pre-rename path (this app was "ESO Build Manager" before it became ESO
-# Helper's viewer). Read as a fallback so a machine's existing hand-written
-# config keeps working; never written to.
-_LEGACY_SYNC_CONFIG_FILE = os.path.expanduser('~/.config/eso-build-manager/sync.json')
-
-
-def _load_sync_config() -> dict:
-    for path in (_SYNC_CONFIG_FILE, _LEGACY_SYNC_CONFIG_FILE):
-        try:
-            with open(path, encoding='utf-8') as f:
-                return json.load(f)
-        except (OSError, ValueError):
-            continue
-    return {}
+# Where ESOHelper.lua lives on this machine, and (in "Sync Server" mode) the
+# sync server's address -- see eso_viewer/sync/config.py for the actual
+# ~/.config/eso-helper/sync.json load/save (shared with settings_dialog.py,
+# which is what now lets server_url/server_token be set from the UI instead
+# of only by hand-editing the file). remote_dir is still hand-edit-only, kept
+# out of the UI since it's a private local filesystem path:
+#   {"remote_dir": "/path/to/.../SavedVariables"}
+# "This PC" mode (see settings_dialog.py) reads remote_dir straight off local
+# disk (not scp -- there's no other-machine SSH option anymore).
+#
+# "Sync Server" mode (eso_viewer/sync/server.py) ignores remote_dir entirely
+# and instead reads two more keys from the same file:
+#   {"server_url": "http://my-server:8091", "server_token": "..."}
+_load_sync_config = sync_config.load
 
 
 def _pull_save_file() -> None:
-    # 'this_pc' mode reads save files straight off local disk instead of scp-ing
-    # over the network — for when the game and the build manager are running on
-    # the same machine (e.g. streaming from this PC). Set in Options…
+    # 'this_pc' mode -- copies save files off local disk, for when the game
+    # and the build manager are running on the same machine (e.g. streaming
+    # from this PC). Set in Options…
     cfg = _load_sync_config()
     remote_dir = cfg.get('remote_dir')
-    host = cfg.get('host')
     if not remote_dir:
         return  # no ~/.config/eso-helper/sync.json yet -- nothing to pull
 
-    sync_mode = QSettings().value('sync/mode', 'remote')
-    if sync_mode == 'this_pc':
-        for fname in _SYNC_FILES:
-            try:
-                shutil.copy(os.path.join(remote_dir, fname), os.path.join(_DIR, fname))
-            except Exception:
-                pass
-        return
-    if not host:
-        return
     for fname in _SYNC_FILES:
         try:
-            subprocess.run(
-                ['scp', '-q', f'{host}:{remote_dir}/{fname}', os.path.join(_DIR, fname)],
-                timeout=8, capture_output=True,
-            )
+            shutil.copy(os.path.join(remote_dir, fname), os.path.join(_DIR, fname))
         except Exception:
             pass
 
@@ -103,6 +83,111 @@ def load_worn_gear() -> dict[str, dict]:
     if not os.path.exists(WORN_FILE):
         return {}
     return model.extract_worn_gear(lua_parser.load(open(WORN_FILE, encoding='utf-8').read()))
+
+
+def _load_local_lua_data() -> dict:
+    """ESOHelper.lua's SavedVariables file has every account-wide table
+    (characters, achievements, set collections, worn gear) in one place --
+    parsed once here and shared across all four, straight off whatever
+    _pull_save_file() just pulled onto local disk. Only used in "This PC"
+    mode, from _ReloadWorker.run() -- module-level (not a MainWindow method)
+    since that worker runs on its own QThread, not the GUI thread."""
+    if not os.path.exists(WORN_FILE):
+        return {}
+    return lua_parser.load(open(WORN_FILE, encoding='utf-8').read())
+
+
+class _ReloadWorker(QThread):
+    """Runs _reload()'s actual I/O off the Qt GUI thread: a local file parse
+    (+ optional push, "This PC" mode) or a fetch_all() round-trip ("Sync
+    Server" mode). Both of those can block for seconds (sync_server.py's
+    _TIMEOUT=8s per request) -- before this, _reload() ran them directly on
+    whichever thread called it (Ctrl+R, the 60s timer, the save-file
+    watcher's debounce, or -- see SyncEventListener -- an SSE push), which is
+    the GUI thread, freezing the whole window for as long as a slow/hung
+    network call took to time out. MainWindow._reload() now just starts one
+    of these and returns immediately; _on_reload_succeeded/_on_reload_failed
+    (connected to this worker's signals, so Qt marshals the call back onto
+    the GUI thread) apply the result once it's done."""
+    succeeded = Signal(dict)
+    failed = Signal(str)
+
+    def __init__(self, mode: str, push_enabled: bool, parent=None):
+        super().__init__(parent)
+        self._mode = mode
+        self._push_enabled = push_enabled
+
+    def run(self):
+        # Temporary timing instrumentation (2026-09-17) -- user reported lag
+        # on "loading" and on switching NA/EU; this narrows down whether it's
+        # this worker's own fetch/parse (the network- or disk-bound half) or
+        # the GUI-thread _rebuild_tabs() that follows it (the CPU/Qt-widget-
+        # construction half, which switching NA/EU also goes through even
+        # though it never touches this worker at all). Remove once answered.
+        _t0 = time.monotonic()
+        try:
+            if self._mode == 'server':
+                # See MainWindow._reload()'s old comment, preserved here:
+                # worn-gear loadouts ride along as each Character's own
+                # gear_loadouts field (model.py), so the Builds tab's Armory
+                # panel works here too; only the Skills tab's
+                # __class_skills__ fallback still goes without, since that's
+                # read straight off raw lua_data rather than anything carried
+                # on Character.
+                cfg = _load_sync_config()
+                if not cfg.get('server_url'):
+                    raise sync_server.SyncServerError(
+                        "no server_url in ~/.config/eso-helper/sync.json")
+                data = sync_server.fetch_all(cfg.get('server_url'), cfg.get('server_token'))
+                chars = [model.character_from_dict(c) for c in data['characters']]
+                achievements = [model.achievements_from_dict(a) for a in data['achievements']]
+                set_collections = [model.set_collections_from_dict(s) for s in data['set_collections']]
+                worn_data = {c.name: c.gear_loadouts for c in chars if c.gear_loadouts}
+                push_error = None
+            else:
+                _pull_save_file()
+                lua_data = _load_local_lua_data()
+                chars = model.extract_from_wg(lua_data)
+                achievements = model.extract_achievements(lua_data)
+                set_collections = model.extract_set_collections(lua_data)
+                worn_data = model.extract_worn_gear(lua_data)
+                push_error = None
+                if self._push_enabled:
+                    push_error = _push_to_sync_server(chars, achievements, set_collections)
+        except Exception as e:
+            import traceback; traceback.print_exc()
+            self.failed.emit(str(e))
+            return
+        logging.info('_ReloadWorker(%s): fetch/parse took %.0fms (%d chars)',
+                      self._mode, (time.monotonic() - _t0) * 1000, len(chars))
+        self.succeeded.emit({
+            'chars': chars,
+            'achievements': achievements,
+            'set_collections': set_collections,
+            'worn_data': worn_data,
+            'push_error': push_error,
+        })
+
+
+def _push_to_sync_server(chars, achievements, set_collections) -> str | None:
+    """Producer side of "This PC" mode's "Also push this PC's data to the
+    Sync Server" setting (see settings_dialog.py) -- for zeus, which needs to
+    both read its own local save data AND keep the sync server fresh for
+    other machines' "Sync Server" mode clients. Only ever called from
+    _ReloadWorker.run(), right after a successful local parse. Returns an
+    error string (never raises) on failure -- a failed push shouldn't turn a
+    perfectly good local reload into an error, and the next reload (60s
+    timer, file watcher, Ctrl+R) will just try again."""
+    cfg = _load_sync_config()
+    server_url = cfg.get('server_url')
+    if not server_url:
+        return None
+    try:
+        sync_server.push_all(server_url, cfg.get('server_token'), chars, achievements, set_collections)
+        return None
+    except sync_server.SyncServerError as e:
+        import traceback; traceback.print_exc()
+        return str(e)
 
 
 def _fmt_time(s: int) -> str:
@@ -185,7 +270,15 @@ def _make_view(tbl: CharTable) -> QTableView:
     tv.setAlternatingRowColors(True)
     tv.setSelectionBehavior(QTableView.SelectRows)
     tv.verticalHeader().setVisible(False)
-    tv.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+    # Fixed (not Stretch): Stretch forces Qt to recompute every row's height
+    # to divide the viewport evenly across ALL rows on every layout pass --
+    # cheap for a ~25-row character table, but the achievements table holds
+    # the full in-game achievement catalog (thousands of rows) and Stretch
+    # there was measured taking 3+ seconds per rebuild (see git history /
+    # 2026-09-18 timing instrumentation). Fixed gives each row a constant
+    # height in O(1) regardless of row count.
+    tv.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+    tv.verticalHeader().setDefaultSectionSize(24)
     tv.setShowGrid(False)
     tv.setWordWrap(False)
     tv.setMouseTracking(True)
@@ -200,7 +293,15 @@ def _make_view(tbl: CharTable) -> QTableView:
 
     hh = tv.horizontalHeader()
     hh.setDefaultAlignment(Qt.AlignCenter)
-    hh.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+    # Interactive + a fixed starting width (not ResizeToContents): column 0 is
+    # always a short label ("Character"/"Account"/"Category"), but
+    # ResizeToContents must measure every row's text to find the widest one --
+    # O(n), and for the achievements table (full in-game catalog, 1000+ rows)
+    # that measured at 2+ seconds per rebuild, done twice (once in this
+    # function's own sortByColumn below, again when the widget is actually
+    # shown). Interactive still lets the user drag-resize it by hand.
+    hh.setSectionResizeMode(0, QHeaderView.Interactive)
+    hh.resizeSection(0, 140)
     for i in range(1, tbl.columnCount()):
         hh.setSectionResizeMode(i, QHeaderView.Stretch)
     hh.setStretchLastSection(False)
@@ -336,25 +437,12 @@ class _PillDelegate(QStyledItemDelegate):
         painter.restore()
 
 
-def _overview_idle_crafts(c: model.Character) -> list[str]:
-    """Smithing crafts (Alchemy/Enchanting have no slot concept) with a free
-    research slot and something left to learn -- the one genuinely actionable
-    research signal, vs. just restating known/total for every craft."""
-    idle = []
-    for craft_name in model.RESEARCH_CRAFTS:
-        cr = c.research.get(craft_name)
-        if cr and cr.max_simultaneous > 0 and cr.known < cr.total and cr.active < cr.max_simultaneous:
-            idle.append(craft_name)
-    return idle
-
-
 def _overview_attention_count(c: model.Character) -> int:
     n = 0
     if not c.daily_dungeon_done:         n += 1
     if not c.daily_writs_done:           n += 1
     if not c.daily_horse_training_done:  n += 1
     if not c.daily_remains_silent_done:  n += 1
-    n += len(_overview_idle_crafts(c))
     return n
 
 
@@ -402,29 +490,6 @@ def _overview_card(c: model.Character) -> QFrame:
     daily_row.addWidget(_status_pill('Remains-Silent', c.daily_remains_silent_done))
     daily_row.addStretch()
     vbox.addLayout(daily_row)
-
-    idle_crafts = _overview_idle_crafts(c)
-    research_lbl = QLabel()
-    research_lbl.setWordWrap(True)
-    relevant = {name: cr for name, cr in c.research.items() if cr.total}
-    incomplete = {name: cr for name, cr in relevant.items() if cr.known < cr.total}
-    if idle_crafts:
-        research_lbl.setText('Idle research: ' + ', '.join(idle_crafts))
-        research_lbl.setStyleSheet('font-size: 10px; color: #fbbf24;')
-    elif not relevant:
-        research_lbl.setText('No research data yet')
-        research_lbl.setStyleSheet('font-size: 10px; color: palette(placeholderText); font-style: italic;')
-    elif not incomplete:
-        research_lbl.setText('Research fully known')
-        research_lbl.setStyleSheet('font-size: 10px; color: #4dbd74;')
-    else:
-        # Just the craft names -- this is an overview, not the Research tab,
-        # so skip the per-craft known/total fractions (those forced long
-        # unwrapped lines wide enough to blow out the card grid's column
-        # width and push the whole tab into horizontal scroll).
-        research_lbl.setText('In progress: ' + ', '.join(incomplete))
-        research_lbl.setStyleSheet('font-size: 10px; color: palette(placeholderText);')
-    vbox.addWidget(research_lbl)
 
     return card
 
@@ -626,7 +691,7 @@ def _tab_skills(chars: list[model.Character], worn_data: dict | None = None) -> 
     for c in chars:
         native = _NATIVE_CLASS_LINES.get(c.class_name, frozenset())
         class_lines = [s for s in c.skills_class if s.name in native]
-        # Fall back to WornGear's separate __class_skills__ block when skills_class is missing native lines
+        # Fall back to the addon's separate __class_skills__ block when skills_class is missing native lines
         if len(class_lines) < 3 and worn_data:
             wg_lines = (worn_data.get(c.name) or {}).get('__class_skills__') or []
             if wg_lines:
@@ -689,42 +754,6 @@ def _tab_crafting(chars: list[model.Character]) -> QTableView:
         for n in craft_names:
             v = lookup.get(n)
             row.append(_cell(v if v is not None else '—', v or 0, None, _rank_color(v or 0)))
-        rows.append(row)
-    return _make_view(CharTable(headers, rows))
-
-
-_RESEARCH_CRAFT_ORDER = model.RESEARCH_CRAFTS
-
-
-def _tab_research(chars: list[model.Character]) -> QTableView:
-    headers = ['Character'] + _RESEARCH_CRAFT_ORDER
-    idle_color = QColor('#fbbf24')
-    done_color = QColor('#4dbd74')
-
-    rows = []
-    for c in chars:
-        row = [_cell(c.name, c.name)]
-        for craft_name in _RESEARCH_CRAFT_ORDER:
-            cr = c.research.get(craft_name)
-            if not cr or cr.total == 0:
-                row.append(_cell('—', -1))
-                continue
-            complete = cr.known >= cr.total
-            text = f'{cr.known}/{cr.total} known'
-            # Alchemy/Enchanting have no research-slot concept (learned instantly,
-            # no simultaneous limit) -- maxSimultaneous is always 0 for those,
-            # which doubles as the "not applicable" signal here.
-            if cr.max_simultaneous == 0:
-                tip = None
-                color = done_color if complete else None
-            else:
-                idle = cr.max_simultaneous - cr.active
-                tip = f'{cr.active}/{cr.max_simultaneous} research slots in use'
-                remaining = cr.next_completion_time - int(time.time())
-                if remaining > 0:
-                    tip += f' — next done in {_fmt_time(remaining)}'
-                color = done_color if complete else (idle_color if idle > 0 else None)
-            row.append(_cell(text, cr.known, tip, color))
         rows.append(row)
     return _make_view(CharTable(headers, rows))
 
@@ -1038,7 +1067,7 @@ class AchievementsTab(QWidget):
                 self._table_view.deleteLater()
                 self._table_view = None
             if self._placeholder is None:
-                self._placeholder = QLabel('No achievement data yet — sync a character with the WornGear addon.')
+                self._placeholder = QLabel('No achievement data yet — sync a character with the ESO Helper addon.')
                 self._placeholder.setAlignment(Qt.AlignCenter)
                 self._placeholder.setStyleSheet('color: palette(placeholderText); font-style: italic; padding: 24px;')
                 self._table_slot.addWidget(self._placeholder)
@@ -1100,14 +1129,23 @@ class AchievementsTab(QWidget):
                 rows.append(row)
 
         status_col = len(headers) - 1
+        _ta = time.monotonic()  # temporary timing instrumentation
         tv = _make_view(CharTable(headers, rows))
+        logging.info('AchievementsTab._rebuild_table: _make_view took %.0fms (%d rows)',
+                      (time.monotonic() - _ta) * 1000, len(rows))
         tv.setItemDelegateForColumn(status_col, _PillDelegate(tv))
+        _ta = time.monotonic()
         if prev_state:
             _restore_view_state(tv, prev_state)
         else:
             tv.sortByColumn(headers.index('Category'), Qt.SortOrder.AscendingOrder)
+        logging.info('AchievementsTab._rebuild_table: sort/restore took %.0fms',
+                      (time.monotonic() - _ta) * 1000)
+        _ta = time.monotonic()
         self._table_slot.addWidget(tv, 1)
         self._table_view = tv
+        logging.info('AchievementsTab._rebuild_table: addWidget took %.0fms',
+                      (time.monotonic() - _ta) * 1000)
 
 
 def _set_card(acct: model.AccountSetCollections) -> QFrame:
@@ -1252,7 +1290,7 @@ class SetsTab(QWidget):
                 self._table_view.deleteLater()
                 self._table_view = None
             if self._placeholder is None:
-                self._placeholder = QLabel('No set collection data yet — sync a character with the WornGear addon.')
+                self._placeholder = QLabel('No set collection data yet — sync a character with the ESO Helper addon.')
                 self._placeholder.setAlignment(Qt.AlignCenter)
                 self._placeholder.setStyleSheet('color: palette(placeholderText); font-style: italic; padding: 24px;')
                 self._table_slot.addWidget(self._placeholder)
@@ -1322,7 +1360,10 @@ class SetsTab(QWidget):
                 rows.append(row)
 
         status_col = len(headers) - 1
+        _ta = time.monotonic()  # temporary timing instrumentation
         tv = _make_view(CharTable(headers, rows))
+        logging.info('SetsTab._rebuild_table: _make_view took %.0fms (%d rows)',
+                      (time.monotonic() - _ta) * 1000, len(rows))
         tv.setItemDelegateForColumn(status_col, _PillDelegate(tv))
         if prev_state:
             _restore_view_state(tv, prev_state)
@@ -1343,7 +1384,7 @@ _ARMORY_ROLE = Qt.ItemDataRole.UserRole + 1  # stores (char_name, build_name) tu
 
 class ArmoryBuildListPanel(QWidget):
     """Left-hand list of a character's in-game Armory loadouts, as captured by
-    the WornGear addon. Read-only -- no saved builds, no add/edit/delete."""
+    the ESO Helper addon. Read-only -- no saved builds, no add/edit/delete."""
     armory_selected = Signal(str, str)  # (char_name, build_name)
 
     def __init__(self, parent=None):
@@ -1425,7 +1466,7 @@ class ArmoryBuildListPanel(QWidget):
 
 class BuildsTab(QWidget):
     """Read-only view of each character's in-game Armory loadouts (skills / CP /
-    gear), populated entirely from the WornGear addon. No build authoring: no
+    gear), populated entirely from the ESO Helper addon. No build authoring: no
     saved builds, no editor, no import/export -- pick a character, pick a
     loadout, look at what it's running."""
 
@@ -1625,14 +1666,24 @@ class MainWindow(QMainWindow):
 
         self._setup_menu()
 
-        # Account picker: hidden unless characters from more than one ESO
-        # account show up in the data, since most setups only ever have one.
+        # Account/Server pickers: each hidden individually unless characters from
+        # more than one ESO account / more than one megaserver (NA vs EU -- see
+        # model.py's Character.server) show up in the data, since most setups
+        # only ever have one of each. The row itself stays visible as long as
+        # either one has something to filter.
         acct_row = QHBoxLayout()
-        acct_row.addWidget(QLabel('Account:'))
+        self._account_label = QLabel('Account:')
+        acct_row.addWidget(self._account_label)
         self._account_picker = QComboBox()
         self._account_picker.addItem('All Accounts', None)
         self._account_picker.currentIndexChanged.connect(self._on_account_changed)
         acct_row.addWidget(self._account_picker)
+        self._server_label = QLabel('Server:')
+        acct_row.addWidget(self._server_label)
+        self._server_picker = QComboBox()
+        self._server_picker.addItem('All Servers', None)
+        self._server_picker.currentIndexChanged.connect(self._on_server_changed)
+        acct_row.addWidget(self._server_picker)
         acct_row.addStretch()
         self._account_row = QWidget()
         self._account_row.setLayout(acct_row)
@@ -1653,12 +1704,32 @@ class MainWindow(QMainWindow):
         self._achievements_tab: AchievementsTab | None = None
         self._sets_tab: SetsTab | None = None
 
+        # Only asked once, ever -- a machine that already has a sync/mode
+        # saved (from a previous run, or from Settings) keeps using it
+        # silently instead of popping this up over whatever else is on
+        # screen (e.g. the game, full-screen, on zeus) every single launch.
+        # Change modes via Settings if needed.
+        if not self._settings.contains('sync/mode'):
+            from eso_viewer.ui.startup_dialog import StartupModeDialog
+            dlg = StartupModeDialog(self)
+            if dlg.exec() and dlg.mode:
+                self._settings.setValue('sync/mode', dlg.mode)
+
+        self._reload_worker: _ReloadWorker | None = None
+        self._event_listener: sync_events.SyncEventListener | None = None
+        # Belt-and-braces alongside _tray_quit()'s own stop() call: the
+        # composed app (eso-helper's own main.py) has its own outer tray
+        # Quit action that calls QApplication.quit() directly rather than
+        # going through this window's _tray_quit(), so this is the one path
+        # guaranteed to run before the SyncEventListener QThread would
+        # otherwise get destroyed while still running (a Qt warning at best,
+        # a crash at worst) no matter which "Quit" actually fired.
+        QApplication.instance().aboutToQuit.connect(self._stop_background_threads)
         self._reload()
 
         self._auto_refresh_timer = QTimer(self)
-        self._auto_refresh_timer.setInterval(60_000)
         self._auto_refresh_timer.timeout.connect(self._reload)
-        self._auto_refresh_timer.start()
+        self._apply_refresh_strategy()
 
         # Reloads shortly (debounced) after the game actually writes new
         # SavedVariables data in "This PC" mode, instead of waiting on the 60s
@@ -1698,8 +1769,15 @@ class MainWindow(QMainWindow):
 
     def _tray_quit(self):
         self._quitting = True
+        self._stop_background_threads()
         self.close()
         QApplication.quit()
+
+    def _stop_background_threads(self):
+        if self._event_listener is not None:
+            self._event_listener.stop()
+            self._event_listener.wait(2000)
+            self._event_listener = None
 
     def _init_save_watcher(self):
         """(Re)establish the SavedVariables watch for "This PC" mode -- reads
@@ -1721,7 +1799,7 @@ class MainWindow(QMainWindow):
         for path in self._save_watcher.directories() + self._save_watcher.files():
             self._save_watcher.removePath(path)
 
-        if QSettings().value('sync/mode', 'remote') != 'this_pc':
+        if QSettings().value('sync/mode', 'this_pc') != 'this_pc':
             return
         remote_dir = _load_sync_config().get('remote_dir')
         if not remote_dir or not os.path.isdir(remote_dir):
@@ -1744,7 +1822,7 @@ class MainWindow(QMainWindow):
         self._save_change_debounce.start()
 
     def _on_save_dir_changed(self, path: str):
-        # A directory-level watch survives the game replacing WornGear.lua
+        # A directory-level watch survives the game replacing ESOHelper.lua
         # wholesale (write-to-temp-then-rename) -- a file-level QFileSystemWatcher
         # would silently stop firing after the first such change, since the
         # original inode it was watching is gone. Debounced (SAVE_CHANGE_DEBOUNCE_MS)
@@ -1780,10 +1858,11 @@ class MainWindow(QMainWindow):
     def _open_settings(self):
         from eso_viewer.ui.settings_dialog import SettingsDialog
         SettingsDialog(self).exec()
-        # Picks up a changed sync mode (This PC / Remote Host) or any
+        # Picks up a changed sync mode (This PC / Sync Server) or any
         # untracked-dailies changes made in the dialog without waiting for the
         # 60s auto-refresh timer to fire.
         self._init_save_watcher()
+        self._apply_refresh_strategy()
         self._reload()
 
     def _about(self):
@@ -1794,41 +1873,85 @@ class MainWindow(QMainWindow):
             '&copy; CubicSerenity')
 
     def _reload(self):
+        # Guards against overlapping reloads -- Ctrl+R, the 60s timer/SSE
+        # push, and the save-file watcher's debounce can all fire close
+        # together, and _ReloadWorker instances aren't safe to run two of at
+        # once against the same self._all_chars etc. The one already in
+        # flight will apply its own (fresher-or-equal) result shortly; this
+        # request is simply dropped rather than queued.
+        if self._reload_worker is not None and self._reload_worker.isRunning():
+            return
         self._reload_action.setEnabled(False)
         self._status.showMessage('Loading…')
-        QApplication.processEvents()
-        try:
-            _pull_save_file()
-            lua_data = self._load_local_data()
-            self._all_chars = model.extract_from_wg(lua_data)
-            self._all_achievements = model.extract_achievements(lua_data)
-            self._all_set_collections = model.extract_set_collections(lua_data)
-            self._worn_data = model.extract_worn_gear(lua_data)
-            self._update_account_picker()
-            self._rebuild_tabs()
-            _record_gold_snapshot(self._all_chars)
-        except Exception as e:
-            import traceback; traceback.print_exc()
-            self._status.showMessage(f'Error: {e}')
-        finally:
-            self._reload_action.setEnabled(True)
+        mode = QSettings().value('sync/mode', 'this_pc')
+        push_enabled = mode != 'server' and QSettings().value('sync/push_enabled', False, type=bool)
+        worker = _ReloadWorker(mode, push_enabled, self)
+        worker.succeeded.connect(self._on_reload_succeeded)
+        worker.failed.connect(self._on_reload_failed)
+        self._reload_worker = worker
+        worker.start()
 
-    def _load_local_data(self) -> dict:
-        """WornGear.lua's SavedVariables file has every account-wide table
-        (characters, achievements, set collections, worn gear) in one place --
-        parsed once here and shared across all four, straight off whatever
-        _pull_save_file() just pulled onto local disk. Replaces the old
-        per-resource sync-server download methods (server/, eso_viewer/
-        sync/server.py -- both removed; this machine is always both the game
-        client and the viewer now, or reads a single other machine via scp,
-        not a many-producers merge through a central server)."""
-        if not os.path.exists(WORN_FILE):
-            return {}
-        return lua_parser.load(open(WORN_FILE, encoding='utf-8').read())
+    def _on_reload_succeeded(self, result: dict):
+        self._all_chars = result['chars']
+        self._all_achievements = result['achievements']
+        self._all_set_collections = result['set_collections']
+        self._worn_data = result['worn_data']
+        self._update_account_picker()
+        self._rebuild_tabs()
+        _record_gold_snapshot(self._all_chars)
+        if result['push_error']:
+            self._status.showMessage(f"Local data loaded, but push to sync server failed: {result['push_error']}")
+        else:
+            self._status.clearMessage()
+        self._reload_action.setEnabled(True)
+
+    def _on_reload_failed(self, message: str):
+        self._status.showMessage(f'Error: {message}')
+        self._reload_action.setEnabled(True)
+
+    def _apply_refresh_strategy(self):
+        """Called once at startup and again after Settings closes (sync mode
+        or server_url may have just changed). "Sync Server" mode gets an
+        `SyncEventListener` (see eso_viewer/sync/events.py) instead of relying
+        on the 60s timer -- the sync server pushes a `characters_updated`/etc.
+        SSE event within seconds of any other machine's push, rather than
+        this client finding out up to a minute later. The 60s timer is kept
+        running as a much-longer-interval backstop (5 min) in either mode:
+        for "This PC" it's the original always-on poll (belt-and-braces
+        alongside the save-file watcher), and for "Sync Server" it's a safety
+        net in case the SSE connection is silently stuck reconnecting."""
+        mode = QSettings().value('sync/mode', 'this_pc')
+        self._auto_refresh_timer.setInterval(60_000 if mode != 'server' else 300_000)
+        if not self._auto_refresh_timer.isActive():
+            self._auto_refresh_timer.start()
+
+        if self._event_listener is not None:
+            self._event_listener.event_received.disconnect(self._on_sync_event)
+            self._event_listener.stop()
+            self._event_listener.wait(2000)
+            self._event_listener = None
+
+        if mode == 'server':
+            cfg = _load_sync_config()
+            server_url = cfg.get('server_url')
+            if server_url:
+                listener = sync_events.SyncEventListener(server_url, cfg.get('server_token'), self)
+                listener.event_received.connect(self._on_sync_event)
+                listener.start()
+                self._event_listener = listener
+
+    def _on_sync_event(self, _event: str):
+        # Every resource event (characters_updated/achievements_updated/
+        # set_collections_updated) triggers the same full _reload() --
+        # fetch_all() always pulls all three together anyway (see
+        # _ReloadWorker.run()), so there's no cheaper partial-refresh to do.
+        self._reload()
 
     def _update_account_picker(self):
         accounts = sorted({c.account for c in self._all_chars if c.account})
+        servers = sorted({c.server for c in self._all_chars if c.server})
         previous = self._account_picker.currentData()
+        prev_server = self._server_picker.currentData()
 
         self._account_picker.blockSignals(True)
         self._account_picker.clear()
@@ -1839,19 +1962,42 @@ class MainWindow(QMainWindow):
         self._account_picker.setCurrentIndex(restore_idx if restore_idx >= 0 else 0)
         self._account_picker.blockSignals(False)
 
-        self._account_row.setVisible(len(accounts) > 1)
+        self._server_picker.blockSignals(True)
+        self._server_picker.clear()
+        self._server_picker.addItem('All Servers', None)
+        for srv in servers:
+            self._server_picker.addItem(srv, srv)
+        restore_idx = self._server_picker.findData(prev_server)
+        self._server_picker.setCurrentIndex(restore_idx if restore_idx >= 0 else 0)
+        self._server_picker.blockSignals(False)
+
+        self._account_label.setVisible(len(accounts) > 1)
+        self._account_picker.setVisible(len(accounts) > 1)
+        self._server_label.setVisible(len(servers) > 1)
+        self._server_picker.setVisible(len(servers) > 1)
+        self._account_row.setVisible(len(accounts) > 1 or len(servers) > 1)
 
     def _on_account_changed(self, _idx: int) -> None:
         self._rebuild_tabs()
 
+    def _on_server_changed(self, _idx: int) -> None:
+        self._rebuild_tabs()
+
     def _rebuild_tabs(self):
+        _t0 = time.monotonic()  # temporary timing instrumentation, see _ReloadWorker.run()
         selected_account = self._account_picker.currentData()
-        chars = self._all_chars if selected_account is None else \
-            [c for c in self._all_chars if c.account == selected_account]
-        achievement_accounts = self._all_achievements if selected_account is None else \
-            [a for a in self._all_achievements if a.account == selected_account]
-        set_accounts = self._all_set_collections if selected_account is None else \
-            [a for a in self._all_set_collections if a.account == selected_account]
+        selected_server = self._server_picker.currentData()
+
+        def _filtered(items):
+            if selected_account is not None:
+                items = [i for i in items if i.account == selected_account]
+            if selected_server is not None:
+                items = [i for i in items if i.server == selected_server]
+            return items
+
+        chars = _filtered(self._all_chars)
+        achievement_accounts = _filtered(self._all_achievements)
+        set_accounts = _filtered(self._all_set_collections)
         worn_data = self._worn_data
 
         # Tabs are nested two levels deep (see `groups` below) -- remember which
@@ -1866,20 +2012,26 @@ class MainWindow(QMainWindow):
         # do with character-data freshness -- update them in place instead of
         # destroying/recreating every reload, or a background refresh bounces the
         # user back to defaults (top of list, filters reset) every 60s.
+        _t1 = time.monotonic()  # temporary timing instrumentation
         if self._builds_tab is None:
             self._builds_tab = BuildsTab(chars, worn_data)
         else:
             self._builds_tab.update_data(chars, worn_data)
+        logging.info('_rebuild_tabs: builds_tab took %.0fms', (time.monotonic() - _t1) * 1000)
 
+        _t1 = time.monotonic()
         if self._achievements_tab is None:
             self._achievements_tab = AchievementsTab(achievement_accounts)
         else:
             self._achievements_tab.update_data(achievement_accounts)
+        logging.info('_rebuild_tabs: achievements_tab took %.0fms', (time.monotonic() - _t1) * 1000)
 
+        _t1 = time.monotonic()
         if self._sets_tab is None:
             self._sets_tab = SetsTab(set_accounts)
         else:
             self._sets_tab.update_data(set_accounts)
+        logging.info('_rebuild_tabs: sets_tab took %.0fms', (time.monotonic() - _t1) * 1000)
 
         _kept_tabs = (self._builds_tab, self._achievements_tab, self._sets_tab)
 
@@ -1916,23 +2068,28 @@ class MainWindow(QMainWindow):
         # Collection -- it's the tab actually opened most, so it gets equal
         # billing with Character/Activities/Storage/Collection instead of
         # being a click deeper.
+        def _timed(label, fn, *a):  # temporary timing instrumentation
+            _tt0 = time.monotonic()
+            result = fn(*a)
+            logging.info('_rebuild_tabs: %s took %.0fms', label, (time.monotonic() - _tt0) * 1000)
+            return result
+
         groups = [
             ('🧙 Character', [
-                (_tab_overview(chars),          '🏠 Overview'),
-                (_tab_bio(chars),               '👤 Bio'),
-                (_tab_stats(chars),             '📊 Stats'),
-                (_tab_skills(chars, worn_data), '⚔️ Skills'),
-                (_tab_guilds(chars),            '🏰 Guilds'),
-                (_tab_champion(chars),          '🌟 Champion'),
+                (_timed('_tab_overview', _tab_overview, chars),          '🏠 Overview'),
+                (_timed('_tab_bio', _tab_bio, chars),               '👤 Bio'),
+                (_timed('_tab_stats', _tab_stats, chars),             '📊 Stats'),
+                (_timed('_tab_skills', _tab_skills, chars, worn_data), '⚔️ Skills'),
+                (_timed('_tab_guilds', _tab_guilds, chars),            '🏰 Guilds'),
+                (_timed('_tab_champion', _tab_champion, chars),          '🌟 Champion'),
             ]),
             ('📅 Activities', [
-                (_tab_dailies(chars, on_change=self._reload), '✅ Dailies'),
-                (_tab_crafting(chars),          '🔨 Crafting'),
-                (_tab_research(chars),          '🔬 Research'),
+                (_timed('_tab_dailies', _tab_dailies, chars, self._reload), '✅ Dailies'),
+                (_timed('_tab_crafting', _tab_crafting, chars),          '🔨 Crafting'),
             ]),
             ('📦 Storage', [
-                (_tab_inventory(chars),         '🎒 Inventory'),
-                (_tab_bank(chars),              '🏦 Bank'),
+                (_timed('_tab_inventory', _tab_inventory, chars),         '🎒 Inventory'),
+                (_timed('_tab_bank', _tab_bank, chars),            '🏦 Bank'),
             ]),
             ('🏆 Collection', [
                 (self._achievements_tab,        '🏆 Achievements'),
@@ -1957,6 +2114,8 @@ class MainWindow(QMainWindow):
         if isinstance(self._tabs.currentWidget(), QTabWidget):
             self._tabs.currentWidget().setCurrentIndex(max(cur_sub, 0))
         self._status.showMessage(f'{len(chars)} characters loaded.')
+        logging.info('_rebuild_tabs: took %.0fms (%d chars, on GUI thread -- this is the same cost whether the data came from network or local disk)',
+                      (time.monotonic() - _t0) * 1000, len(chars))
 
 
 # ── Single instance ──────────────────────────────────────────────────────────

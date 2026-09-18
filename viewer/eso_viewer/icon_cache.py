@@ -1,17 +1,18 @@
 """Async skill icon fetching with disk + memory cache."""
 import hashlib
-from pathlib import Path
 
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QPixmap
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 
-_CACHE_DIR = Path.home() / ".local/share/eso-helper/icons"
+from eso_viewer.paths import data_dir
+
+_CACHE_DIR = data_dir() / "eso-helper" / "icons"
 _CACHE_DIR.mkdir(parents=True, exist_ok=True)
 # Pre-rename cache dir (this app was "ESO Build Manager"). Checked as a
 # fallback so already-cached icons aren't silently re-downloaded after the
 # rename; new downloads always land in _CACHE_DIR.
-_LEGACY_CACHE_DIR = Path.home() / ".local/share/eso-build-manager/icons"
+_LEGACY_CACHE_DIR = data_dir() / "eso-build-manager" / "icons"
 
 _pixmap_cache: dict[str, QPixmap] = {}
 _pending: dict[str, list] = {}

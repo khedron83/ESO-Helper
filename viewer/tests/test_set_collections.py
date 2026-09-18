@@ -7,7 +7,7 @@ import parser as lua_parser
 class TestSetCollections(unittest.TestCase):
     def test_extract_from_lua_roundtrip(self):
         lua_text = '''
-        WornGearSetCollectionsSV =
+        ESOHelperSetCollectionsSV =
         {
             ["@khedron83"] =
             {

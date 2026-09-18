@@ -21,7 +21,7 @@ cat > "$DESKTOP_DIR/$APP_ID.desktop" <<EOF
 Type=Application
 Name=ESO Helper
 Comment=Character/activity/loadout viewer and addon manager for Elder Scrolls Online
-Exec=python3 "$PROJECT_DIR/main.py"
+Exec=$PROJECT_DIR/.venv/bin/python "$PROJECT_DIR/main.py"
 Path=$PROJECT_DIR
 Icon=$APP_ID
 Terminal=false
@@ -44,7 +44,7 @@ if [[ "${1:-}" == "--autostart" ]]; then
 Type=Application
 Name=ESO Helper (tray)
 Comment=Background sync -- character/activity/loadout viewer and addon manager for Elder Scrolls Online
-Exec=python3 "$PROJECT_DIR/main.py" --tray
+Exec=$PROJECT_DIR/.venv/bin/python "$PROJECT_DIR/main.py" --tray
 Path=$PROJECT_DIR
 Icon=$APP_ID
 Terminal=false
