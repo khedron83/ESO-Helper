@@ -1,0 +1,9 @@
+## Title: ESO Helper
+## Description: Snapshots character gear, skills, achievements, set collections, and daily status (writs/pledges/Remains-Silent/dungeon) for the ESO Helper companion app.
+## Author: Kane
+## Version: 1
+## APIVersion: 101048 101050
+## SavedVariables: ESOHelperSV ESOHelperAchievementsSV ESOHelperSetCollectionsSV
+## DependsOn: LibSets>=0009030
+
+ESOHelper.lua

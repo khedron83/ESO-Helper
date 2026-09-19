@@ -378,12 +378,25 @@ chars/achievements/set_collections off to the tabs.
 
 ### How data gets from the game to this app
 
-`_pull_save_file()` (main.py) pulls `WornGear.lua`'s SavedVariables file onto local disk when
-`sync/mode` (Settings → Save file source) is **"This PC"** — game and desktop app on the same
-machine, a plain local file copy. **2026-09-17: the "Remote Host (SSH)" `scp` mode was removed**
-— every machine that needs the game's own save data runs the app directly on that machine now
-(zeus), and every other machine reads the sync server instead, so there was no longer a case
-that needed pulling `WornGear.lua` over SSH from a second machine.
+`_pull_save_file()` (main.py) pulls `ESOHelper.lua`'s SavedVariables file (`_SYNC_FILES`) onto
+local disk when `sync/mode` (Settings → Save file source) is **"This PC"** — game and desktop
+app on the same machine, a plain local file copy. **2026-09-17: the "Remote Host (SSH)" `scp`
+mode was removed** — every machine that needs the game's own save data runs the app directly on
+that machine now (zeus), and every other machine reads the sync server instead, so there was no
+longer a case that needed pulling the save file over SSH from a second machine.
+
+The in-game addon itself was renamed alongside the app (`WornGear` → `ESOHelper`, folder and
+`## SavedVariables:` entries both — `viewer/ESOHelper/`, was `viewer/WornGear/`) with a further
+rewrite (NA/EU megaserver tagging, see below) added directly to the deployed copy on zeus and
+**not caught by the 2026-09-18 "bring repo up to date" commit** — that commit only brought the
+Python app source in line with what's deployed, not the addon's own source, so the repo carried a
+stale, pre-rename `WornGear` addon until 2026-09-19. This is more than cosmetic: an addon folder
+named `WornGear` makes ESO write `SavedVariables/WornGear.lua`, a filename `_SYNC_FILES` (which
+only ever looks for `ESOHelper.lua`) silently never finds — confirmed as the actual cause of an
+external tester's "SavedVariables directory auto-detected fine, but no data loads" report, since
+whatever addon copy he'd installed still had the old name. `model.py`'s `ESOHelperSV`-then-
+`WornGearSV` fallback (for the SavedVariables table name inside the file) doesn't help when the
+*file itself* is missing under the expected name.
 
 The path itself is still **not in source** — read from `~/.config/eso-helper/sync.json`
 (`{"remote_dir": "/path/to/.../SavedVariables"}`), a private, non-versioned file outside the
@@ -395,7 +408,7 @@ end up baked into source that might go public someday — `_load_sync_config()` 
 already-configured machine keeps working without hand-editing anything — but it
 never writes to the old path, so move the file over yourself whenever convenient.
 
-Once `WornGear.lua` is local, `MainWindow._reload()` parses it exactly once
+Once `ESOHelper.lua` is local, `MainWindow._reload()` parses it exactly once
 (`_load_local_lua_data()`) and derives characters/achievements/set collections/worn-gear from that
 single parse via `model.extract_from_wg()` / `extract_achievements()` / `extract_set_collections()`
 / `extract_worn_gear()` — no server round-trip, no `*_from_dict()` JSON reconstruction in "This PC"

@@ -1,14 +1,35 @@
-WornGearSV = WornGearSV or {}
+ESOHelperSV = ESOHelperSV or {}
 -- Achievement points/completion are account-wide in modern ESO (shared across
 -- every character on the account, unlike gear/skills/currencies which are
 -- per-character) -- captured once per account into its own top-level
--- SavedVariable, keyed by account name, rather than duplicated into every
--- character's WornGearSV[charName] block.
-WornGearAchievementsSV = WornGearAchievementsSV or {}
+-- SavedVariable, keyed by account name then by megaserver (see GetMegaserver
+-- below): SV[account][server] = {...}. The per-server nesting matters because
+-- the same @account handle has fully independent achievement progress on
+-- NA vs EU, and (on a Steam install) both megaservers share the same single
+-- "live" SavedVariables file -- there's no live/liveeu folder split the way
+-- a standalone Bethesda.net install has, so without this nesting an NA
+-- session's snapshot and an EU session's snapshot for the same account would
+-- just overwrite each other.
+ESOHelperAchievementsSV = ESOHelperAchievementsSV or {}
 -- Same reasoning as achievements: which set pieces you've ever discovered
 -- (unlocked in the "reconstruct a set piece for gold" collection) is
--- account-wide, not per-character.
-WornGearSetCollectionsSV = WornGearSetCollectionsSV or {}
+-- account-wide, not per-character, and independent per megaserver.
+ESOHelperSetCollectionsSV = ESOHelperSetCollectionsSV or {}
+
+-- 'NA'/'EU'/'' from the client's own GetWorldName() (observed values include
+-- "NA Megaserver"/"EU Megaserver"; matched by substring rather than exact
+-- string in case PTS/other environments phrase it differently). This is the
+-- only ground truth for which megaserver the current session is on -- a
+-- Steam install has a single "live" AddOns/SavedVariables folder shared by
+-- both megaservers, so the desktop app's earlier attempt to infer this from
+-- the install path was wrong (confirmed 2026-09-17: a single account's "live"
+-- save data contained both NA and EU characters).
+local function GetMegaserver()
+    local worldName = GetWorldName() or ""
+    if worldName:find("NA") then return "NA" end
+    if worldName:find("EU") then return "EU" end
+    return ""
+end
 
 local EQUIP_SLOTS = {
     { id = EQUIP_SLOT_HEAD,        name = "Head" },
@@ -101,70 +122,6 @@ local HOTBARS = {
     { id = HOTBAR_CATEGORY_PRIMARY, name = "Front Bar" },
     { id = HOTBAR_CATEGORY_BACKUP,  name = "Back Bar" },
 }
-
--- Only these 4 tradeskills expose smithing-style trait research (Alchemy,
--- Enchanting, Provisioning, Scribing don't).
-local RESEARCH_CRAFTS = {
-    { type = CRAFTING_TYPE_BLACKSMITHING,   key = "Blacksmithing" },
-    { type = CRAFTING_TYPE_CLOTHIER,        key = "Clothier" },
-    { type = CRAFTING_TYPE_WOODWORKING,     key = "Woodworking" },
-    { type = CRAFTING_TYPE_JEWELRYCRAFTING, key = "Jewelry" },
-}
-
--- Alchemy reagent traits and Enchanting runes are learned per-character too,
--- but instantly and permanently (no research timer, no simultaneous-slot
--- limit) -- so they're tracked as plain known/total counts alongside the 4
--- smithing crafts above rather than with the active/maxSimultaneous fields.
--- Both Is*Known-style functions take an itemId (via a synthetic item link,
--- no need to actually own the item), so this needs every reagent/rune itemId
--- that exists.
---
--- Reagent IDs come from LibAlchemy.reagents instead of a static list here --
--- LazyAlchemyLearner's own reagent table (previously mirrored) is a
--- *minimal* set sufficient to deduce every trait combination (34 items), not
--- every reagent that exists in the game, so it undercounts "reagents known"
--- as a completion metric. LibAlchemy's table is the actual full roster (61
--- as of this writing) since it needs every reagent to be usable for potion
--- crafting, not just a covering set. There's no equivalent library for
--- Enchanting runes, so ENCHANTING_RUNE_IDS below is still a static list.
-local function MakeItemLink(itemId)
-    return string.format("|H1:item:%d:%d:50:0:0:0:0:0:0:0:0:0:0:0:0:%d:%d:0:0:%d:0|h|h", itemId, 0, 0, 0, 10000)
-end
-
-local ENCHANTING_RUNE_IDS = {
-    -- Potency
-    45856, 45817, 45855, 45818, 45806, 45857, 45820, 45819, 45807, 45822,
-    45821, 45808, 45809, 45810, 45823, 45824, 45812, 45825, 45826, 45811,
-    45827, 45813, 45814, 45828, 45815, 45829, 45830, 45816, 68340, 64508,
-    64509, 68341,
-    -- Essence
-    45839, 45833, 45836, 45842, 68342, 45841, 166045, 45849, 45837, 45848,
-    45832, 45835, 45840, 45831, 45834, 45843, 45846, 45838, 45847,
-    -- Aspect
-    45850, 45851, 45852, 45853, 45854,
-}
-
-local function ReadAlchemyKnowledge()
-    local known, total = 0, 0
-    for itemId in pairs(LibAlchemy.reagents) do
-        local link = MakeItemLink(itemId)
-        for traitIndex = 1, 4 do
-            local isKnown = GetItemLinkReagentTraitInfo(link, traitIndex)
-            total = total + 1
-            if isKnown then known = known + 1 end
-        end
-    end
-    return { known = known, total = total, maxSimultaneous = 0, active = 0 }
-end
-
-local function ReadEnchantingKnowledge()
-    local known, total = 0, 0
-    for _, itemId in ipairs(ENCHANTING_RUNE_IDS) do
-        total = total + 1
-        if GetItemLinkEnchantingRuneName(MakeItemLink(itemId)) then known = known + 1 end
-    end
-    return { known = known, total = total, maxSimultaneous = 0, active = 0 }
-end
 
 -- All skill types to capture (except CHAMPION which is handled separately)
 local SKILL_TYPES = {
@@ -368,51 +325,6 @@ local function ReadChampionData()
     }
 end
 
--- Trait research: per craft, just known/total trait counts and how many
--- research slots are occupied right now -- not which items (a separate addon
--- auto-queues research, so the specific trait/line is never interesting here,
--- only the aggregate progress and whether slots are sitting idle).
--- nextCompletionTime (per craft, and overall = the soonest of the 4) is an
--- absolute GetTimeStamp() the way mount.nextTrainableTime below is -- lets a
--- companion addon compute "which of my characters' research finishes next"
--- purely from this account-wide SavedVariable, without that character having
--- to be logged in when the timer actually elapses.
-local function ReadResearchData()
-    local result = {}
-    local now = GetTimeStamp()
-    local soonest = nil
-    for _, craft in ipairs(RESEARCH_CRAFTS) do
-        local known, total, active = 0, 0, 0
-        local craftSoonest = nil
-        for lineIndex = 1, GetNumSmithingResearchLines(craft.type) do
-            local _, _, numTraits = GetSmithingResearchLineInfo(craft.type, lineIndex)
-            for traitIndex = 1, numTraits do
-                local _, _, isKnown = GetSmithingResearchLineTraitInfo(craft.type, lineIndex, traitIndex)
-                total = total + 1
-                if isKnown then known = known + 1 end
-                local _, timeRemainingSecs = GetSmithingResearchLineTraitTimes(craft.type, lineIndex, traitIndex)
-                if timeRemainingSecs ~= nil then
-                    active = active + 1
-                    local finishAt = now + timeRemainingSecs
-                    if not craftSoonest or finishAt < craftSoonest then craftSoonest = finishAt end
-                end
-            end
-        end
-        result[craft.key] = {
-            known               = known,
-            total               = total,
-            maxSimultaneous     = GetMaxSimultaneousSmithingResearch(craft.type),
-            active              = active,
-            nextCompletionTime  = craftSoonest,
-        }
-        if craftSoonest and (not soonest or craftSoonest < soonest) then soonest = craftSoonest end
-    end
-    result.Alchemy    = ReadAlchemyKnowledge()
-    result.Enchanting = ReadEnchantingKnowledge()
-    result.nextCompletionTime = soonest
-    return result
-end
-
 local function ReadInventory()
     -- Personal inventory only: the bank is one shared pool for all characters
     -- (see bankCurrencies below), so it must never be folded into a character's
@@ -460,13 +372,13 @@ end
 -- the last time a QUEST_TYPE_CRAFTING quest was completed (see the
 -- EVENT_QUEST_COMPLETE handler below) and compares that against the last
 -- reset boundary. Persisted per-character since Snapshot() overwrites
--- WornGearSV[charName] wholesale on every call.
+-- ESOHelperSV[charName] wholesale on every call.
 --
 -- Not Writ Voucher currency: that's a Master Writ reward specifically, not
 -- something the 7 regular daily writs grant, so it never fires for a normal
 -- writ turn-in.
 local function ReadDailyWritStatus(charName)
-    local tracking = WornGearSV[charName] and WornGearSV[charName].__dailyTracking__
+    local tracking = ESOHelperSV[charName] and ESOHelperSV[charName].__dailyTracking__
     local lastCompleted = tracking and tracking.lastWritCompleted or 0
     return lastCompleted >= GetLastDailyResetTimestamp()
 end
@@ -494,7 +406,7 @@ local _REMAINS_SILENT_ITEM_IDS = {
 }
 
 local function ReadRemainsSilentStatus(charName)
-    local tracking = WornGearSV[charName] and WornGearSV[charName].__dailyTracking__
+    local tracking = ESOHelperSV[charName] and ESOHelperSV[charName].__dailyTracking__
     local lastClaimed = tracking and tracking.lastRemainsSilentGift or 0
     return (lastClaimed + 86400) > GetTimeStamp()
 end
@@ -502,14 +414,14 @@ end
 -- Undaunted Pledges: like writs, no clean "already claimed" API, so this
 -- tracks completed QUEST_TYPE_UNDAUNTED_PLEDGE quest names since the last
 -- daily reset (see the EVENT_QUEST_COMPLETE handler below). Tracked by name
--- rather than a fixed count of 3, deliberately -- WornGear doesn't hardcode
+-- rather than a fixed count of 3, deliberately -- ESO Helper doesn't hardcode
 -- the 3 Undaunted rep quest names anywhere (see the Remains-Silent comment
 -- above for why guessing ids/names ahead of actual play has bitten this
 -- addon before); the set of names is self-discovering from whatever actually
 -- completes in-game, and a companion UI can still show "count of 3" from
 -- how many distinct names have shown up.
 local function ReadPledgeStatus(charName)
-    local tracking = WornGearSV[charName] and WornGearSV[charName].__dailyTracking__
+    local tracking = ESOHelperSV[charName] and ESOHelperSV[charName].__dailyTracking__
     local names = tracking and tracking.pledgeNames
     local resetAt = (tracking and tracking.pledgeNamesResetAt) or 0
     if not names or resetAt < GetLastDailyResetTimestamp() then
@@ -518,6 +430,244 @@ local function ReadPledgeStatus(charName)
     local count = 0
     for _ in pairs(names) do count = count + 1 end
     return { count = count, names = names }
+end
+
+-- ── Skill Point Sources ──────────────────────────────────────────────────────
+-- Per-character (unlike ReadAchievements() below): quest completion,
+-- skyshard collection, and skill points are all per-character state in ESO,
+-- not account-wide, so this is captured into ReadCharData()'s own returned
+-- table (which Snapshot() stores under ESOHelperSV[charName]) rather than a
+-- new SavedVariables table alongside ESOHelperAchievementsSV.
+--
+-- The zone/dungeon key → quest/achievement/zone ID mapping below is ported
+-- from Urich's/Vastaryous's Skill Point Finder (github.com/yachoor/uspf,
+-- USPF.lua), a discontinued open-source addon that did this exact
+-- cross-reference -- these IDs aren't derivable from the live API alone (no
+-- "which quest belongs to which zone's skill-point tracker" getter exists),
+-- so reading a working addon's own hardcoded table was the same
+-- read-a-real-addon's-source approach used for the TamrielTactics scroll
+-- fix, just for data instead of UI behavior.
+local ZONE_IDS = {
+    AD0 = 537,  AD1 = 381,  AD2 = 383,  AD3 = 108,  AD4 = 58,   AD5 = 382,
+    DC0a = 535, DC0b = 534, DC1 = 3,    DC2 = 19,   DC3 = 20,   DC4 = 104,
+    DC5 = 92,   EP0a = 281, EP0b = 280, EP1 = 41,   EP2 = 57,   EP3 = 117,
+    EP4 = 101,  EP5 = 103,  CH = 347,   CY = 181,   CL = 888,
+    IC = 584,   WR = 684,   HB = 816,   GC = 823,   VV = 849,   CC = 980,
+    SU = 1011,  MM = 726,   NE = 1086,  WP = 809,   SE = 1133,  WS = 1160,
+    BGC = 1161, TR = 1207,  BW = 1261,  TD = 1286,  HI = 1318,  GY = 1383,
+    AP = 1413,  TP = 1414,  EA = 1436,  WW = 1443,  SO = 1502,
+}
+
+-- Storyline-quest IDs per zone (also the "Zone Quests" skill-point source).
+local ZONE_QUESTS = {
+    { key = "WP",   quests = {} },
+    { key = "AD0",  quests = {} },
+    { key = "AD1",  quests = { 4222, 4345, 4261 } },
+    { key = "AD2",  quests = { 4868, 4386, 4885 } },
+    { key = "AD3",  quests = { 4750, 4765, 4690 } },
+    { key = "AD4",  quests = { 4337, 4452, 4143 } },
+    { key = "AD5",  quests = { 4712, 4479, 4720 } },
+    { key = "DC0a", quests = {} },
+    { key = "DC0b", quests = {} },
+    { key = "DC1",  quests = { 3006, 3235, 3267, 3379 } },
+    { key = "DC2",  quests = { 467, 1633, 575 } },
+    { key = "DC3",  quests = { 465, 4972, 4884 } },
+    { key = "DC4",  quests = { 2192, 2222, 2997 } },
+    { key = "DC5",  quests = { 4891, 4912, 4960 } },
+    { key = "EP1",  quests = { 3735, 3634, 3868 } },
+    { key = "EP2",  quests = { 3797, 3817, 3831 } },
+    { key = "EP3",  quests = { 4590, 4606, 3910 } },
+    { key = "EP4",  quests = { 4061, 4115, 4117 } },
+    { key = "EP5",  quests = { 3968, 4139, 4188 } },
+    { key = "CH",   quests = { 4602, 4730, 4758 } },
+    { key = "CY",   quests = {} },
+    { key = "CL",   quests = {} },
+    { key = "IC",   quests = { 5482 } },
+    { key = "WR",   quests = { 5447, 5468, 5481 } },
+    { key = "HB",   quests = { 5531, 5534, 5532, 5556, 5549, 5545 } },
+    { key = "GC",   quests = { 5540, 5595, 5599, 5596, 5567, 5597, 5598, 5600 } },
+    { key = "VV",   quests = { 6003, 5922, 5948 } },
+    { key = "CC",   quests = { 6050, 6057, 6063, 6025, 6052, 6046, 6047, 6048 } },
+    { key = "SU",   quests = { 6132, 6113, 6126 } },
+    { key = "MM",   quests = { 6246, 6266, 6241, 6259, 6243, 6244, 6245 } },
+    { key = "NE",   quests = { 6336, 6304, 6315 } },
+    { key = "SE",   quests = { 6401, 6409, 6394, 6399, 6403, 6404, 6393, 6397, 6402 } },
+    { key = "WS",   quests = { 6476, 6466, 6481 } },
+    { key = "TR",   quests = { 6550, 6551, 6547, 6548, 6554, 6566, 6552, 6560, 6570 } },
+    { key = "BW",   quests = { 6616, 6619, 6660 } },
+    { key = "TD",   quests = { 6723, 6724, 6707, 6708, 6699, 6700, 6696, 6697, 6693 } },
+    { key = "HI",   quests = { 6753, 6765, 6781, 6762, 6768 } },
+    { key = "GY",   quests = { 6849, 6850, 6855, 6859, 6852, 6853, 6847, 6848, 6894 } },
+    { key = "AP",   quests = { 6971, 6972, 6973, 6974, 6975, 6976, 7025, 6991, 6977 } },
+    { key = "WW",   quests = { 7071, 7072, 7073, 7074, 7075, 7076, 7077, 7078, 7220 } },
+    { key = "SO",   quests = { 7294, 7295, 7296, 7284, 7329, 7285, 7317, 7286, 7393 } },
+}
+
+local MAIN_QUEST_IDS = { 4296, 4831, 4474, 4552, 4607, 4764, 4836, 4837, 4867, 4832, 4847 }
+local TUTORIAL_QUEST_IDS = { 5804, 6143, 6324, 6455, 6646 } -- Morrowind/Summerset/Elsweyr/Greymoor/Blackwood
+local FOLIUM_DISCOGNITUM_QUEST_ID = 3997 -- "The Mad God's Bargain"
+local MAELSTROM_ARENA_ACHIEVEMENT_ID = 1304
+local INFINITE_ARCHIVE_QUEST_ID = 7061
+
+-- One point per completed dungeon-intro quest.
+-- `id` is the dungeon's own zone id (distinct from `zone`, its parent
+-- overland zone) -- used only to look up the dungeon's display name via
+-- GetZoneNameById, same as PUBLIC_DUNGEON_BOSSES below. Originally dropped
+-- during porting from USPF's GD table (only key/zone/quest were kept),
+-- which left ReadSkillPointSources() with no readable dungeon name for
+-- these entries -- fixed by re-porting `id` from USPF.lua's GD table.
+local GROUP_DUNGEON_QUESTS = {
+    { key = "BC1", id = 380,  zone = "AD1", quest = 4107 }, { key = "BC2", id = 935,  zone = "AD1", quest = 4597 },
+    { key = "EH1", id = 126,  zone = "AD2", quest = 4336 }, { key = "EH2", id = 931,  zone = "AD2", quest = 4675 },
+    { key = "CA1", id = 176,  zone = "AD3", quest = 4778 }, { key = "CA2", id = 681,  zone = "AD3", quest = 5120 },
+    { key = "TI",  id = 131,  zone = "AD4", quest = 4538 }, { key = "SW",  id = 31,   zone = "AD5", quest = 4733 },
+    { key = "SC1", id = 144,  zone = "DC1", quest = 4054 }, { key = "SC2", id = 936,  zone = "DC1", quest = 4555 },
+    { key = "WS1", id = 146,  zone = "DC2", quest = 4246 }, { key = "WS2", id = 933,  zone = "DC2", quest = 4813 },
+    { key = "CH1", id = 130,  zone = "DC3", quest = 4379 }, { key = "CH2", id = 932,  zone = "DC3", quest = 5113 },
+    { key = "VF",  id = 22,   zone = "DC4", quest = 4432 }, { key = "BH",  id = 38,   zone = "DC5", quest = 4589 },
+    { key = "FG1", id = 283,  zone = "EP1", quest = 3993 }, { key = "FG2", id = 934,  zone = "EP1", quest = 4303 },
+    { key = "DC1", id = 63,   zone = "EP2", quest = 4145 }, { key = "DC2", id = 930,  zone = "EP2", quest = 4641 },
+    { key = "AC",  id = 148,  zone = "EP3", quest = 4202 }, { key = "DK",  id = 449,  zone = "EP4", quest = 4346 },
+    { key = "BC",  id = 64,   zone = "EP5", quest = 4469 }, { key = "VM",  id = 11,   zone = "CH",  quest = 4822 },
+    { key = "ICP", id = 678,  zone = "CY",  quest = 5136 }, { key = "WGT", id = 688,  zone = "CY",  quest = 5342 },
+    { key = "CS",  id = 848,  zone = "EP3", quest = 5702 }, { key = "RM",  id = 843,  zone = "EP3", quest = 5403 },
+    { key = "BF",  id = 973,  zone = "CL",  quest = 5889 }, { key = "FH",  id = 974,  zone = "CL",  quest = 5891 },
+    { key = "FL",  id = 1009, zone = "DC5", quest = 6064 }, { key = "SP",  id = 1010, zone = "DC2", quest = 6065 },
+    { key = "MHK", id = 1052, zone = "AD5", quest = 6186 }, { key = "MOS", id = 1055, zone = "AD3", quest = 6188 },
+    { key = "DoM", id = 1081, zone = "GC",  quest = 6251 }, { key = "FV",  id = 1080, zone = "EP4", quest = 6249 },
+    { key = "LM",  id = 1123, zone = "AD2", quest = 6351 }, { key = "MF",  id = 1122, zone = "NE",  quest = 6349 },
+    { key = "IR",  id = 1152, zone = "WR",  quest = 6414 }, { key = "UG",  id = 1153, zone = "DC5", quest = 6416 },
+    { key = "SG",  id = 1197, zone = "BGC", quest = 6505 }, { key = "CT",  id = 1201, zone = "WS",  quest = 6507 },
+    { key = "BDV", id = 1228, zone = "GC",  quest = 6576 }, { key = "TC",  id = 1229, zone = "EP2", quest = 6578 },
+    { key = "RPB", id = 1267, zone = "DC1", quest = 6683 }, { key = "TDC", id = 1268, zone = "BW",  quest = 6685 },
+    { key = "CA",  id = 1301, zone = "SU",  quest = 6740 }, { key = "SR",  id = 1302, zone = "DC3", quest = 6742 },
+    { key = "ERE", id = 1360, zone = "HI",  quest = 6835 }, { key = "GD",  id = 1361, zone = "HI",  quest = 6837 },
+    { key = "BS",  id = 1389, zone = "EP1", quest = 6896 }, { key = "SH",  id = 1390, zone = "EP5", quest = 7027 },
+    { key = "OP",  id = 1470, zone = "TR",  quest = 7105 }, { key = "BV",  id = 1471, zone = "WR",  quest = 7155 },
+    { key = "ER",  id = 1496, zone = "WW",  quest = 7235 }, { key = "LS",  id = 1497, zone = "HB",  quest = 7237 },
+    { key = "NC",  id = 1551, zone = "SO",  quest = 7320 }, { key = "BGF", id = 1552, zone = "SO",  quest = 7323 },
+}
+
+-- One point per zone's Public Dungeon group-boss-event achievement. `id` is
+-- the public dungeon's own zone id (distinct from `zone`, its parent zone),
+-- used only to look up the dungeon's display name.
+local PUBLIC_DUNGEON_BOSSES = {
+    { key = "AD1", id = 486, zone = "AD1", achievement = 468 }, { key = "AD2", id = 124, zone = "AD2", achievement = 470 },
+    { key = "AD3", id = 137, zone = "AD3", achievement = 445 }, { key = "AD4", id = 138, zone = "AD4", achievement = 460 },
+    { key = "AD5", id = 487, zone = "AD5", achievement = 469 }, { key = "DC1", id = 284, zone = "DC1", achievement = 380 },
+    { key = "DC2", id = 142, zone = "DC2", achievement = 714 }, { key = "DC3", id = 162, zone = "DC3", achievement = 713 },
+    { key = "DC4", id = 308, zone = "DC4", achievement = 707 }, { key = "DC5", id = 169, zone = "DC5", achievement = 708 },
+    { key = "EP1", id = 216, zone = "EP1", achievement = 379 }, { key = "EP2", id = 306, zone = "EP2", achievement = 388 },
+    { key = "EP3", id = 134, zone = "EP3", achievement = 372 }, { key = "EP4", id = 339, zone = "EP4", achievement = 381 },
+    { key = "EP5", id = 341, zone = "EP5", achievement = 371 }, { key = "CH",  id = 557, zone = "CH",  achievement = 874 },
+    { key = "VFW", id = 919, zone = "VV",  achievement = 1855 },{ key = "VNC", id = 918, zone = "VV",  achievement = 1846 },
+    { key = "WOO", id = 706, zone = "WR",  achievement = 1238 },{ key = "WRK", id = 705, zone = "WR",  achievement = 1235 },
+    { key = "SKW", id = 1020,zone = "SU",  achievement = 2096 },{ key = "SSH", id = 1021,zone = "SU",  achievement = 2095 },
+    { key = "RN",  id = 1089,zone = "NE",  achievement = 2444 },{ key = "OC",  id = 1090,zone = "NE",  achievement = 2445 },
+    { key = "LT",  id = 1186,zone = "WS",  achievement = 2714 },{ key = "NK",  id = 1187,zone = "BGC", achievement = 2715 },
+    { key = "SH",  id = 1260,zone = "BW",  achievement = 2994 },{ key = "ZA",  id = 1259,zone = "BW",  achievement = 2995 },
+    { key = "GHB", id = 1338,zone = "HI",  achievement = 3281 },{ key = "SCC", id = 1337,zone = "HI",  achievement = 3283 },
+    { key = "GO",  id = 1415,zone = "TP",  achievement = 3658 },{ key = "TU",  id = 1416,zone = "AP",  achievement = 3657 },
+    { key = "LW",  id = 1466,zone = "WW",  achievement = 4000 },{ key = "SI",  id = 1467,zone = "WW",  achievement = 4002 },
+    { key = "DG",  id = 1514,zone = "SO",  achievement = 4264 },{ key = "CG",  id = 1530,zone = "SO",  achievement = 4471 },
+}
+
+local LEVEL_CAP = 50 -- skill points from leveling stop accruing here (Champion Points take over)
+local function LevelSkillPoints(level)
+    level = math.min(level, LEVEL_CAP)
+    return math.floor(level / 5) + math.floor(level / 10) + (level - 1)
+end
+
+local function QuestDone(questId) return GetCompletedQuestInfo(questId) ~= "" end
+
+local function ReadSkillPointSources()
+    local level = GetUnitLevel("player")
+
+    local mainQuestEarned = 0
+    for _, questId in ipairs(MAIN_QUEST_IDS) do
+        if QuestDone(questId) then mainQuestEarned = mainQuestEarned + 1 end
+    end
+
+    local tutorialDone = false
+    for _, questId in ipairs(TUTORIAL_QUEST_IDS) do
+        if QuestDone(questId) then tutorialDone = true; break end
+    end
+
+    local zoneQuests = {}
+    for _, zd in ipairs(ZONE_QUESTS) do
+        local earned = 0
+        for _, questId in ipairs(zd.quests) do
+            if QuestDone(questId) then earned = earned + 1 end
+        end
+        zoneQuests[zd.key] = {
+            name   = zd.key ~= "" and GetZoneNameById(ZONE_IDS[zd.key]) or "",
+            earned = earned,
+            total  = #zd.quests,
+        }
+    end
+
+    -- Skyshards: GetNumSkyshardsInZone gives the zone's total, but per-shard
+    -- acquisition needs GetZoneSkyshardId + GetSkyshardDiscoveryStatus.
+    local skyshards = {}
+    for _, zd in ipairs(ZONE_QUESTS) do
+        local zoneId = ZONE_IDS[zd.key]
+        local total = GetNumSkyshardsInZone(zoneId)
+        local earned = 0
+        for i = 1, total do
+            local shardId = GetZoneSkyshardId(zoneId, i)
+            if GetSkyshardDiscoveryStatus(shardId) == SKYSHARD_DISCOVERY_STATUS_ACQUIRED then
+                earned = earned + 1
+            end
+        end
+        skyshards[zd.key] = { name = GetZoneNameById(zoneId), earned = earned, total = total }
+    end
+    -- Known ESO bug (also worked around by USPF): the Wailing Prison shard is
+    -- earned but never marked ACQUIRED if its quest chain was skipped.
+    if skyshards.WP and skyshards.WP.earned == 0 and QuestDone(MAIN_QUEST_IDS[1]) then
+        skyshards.WP.earned = 1
+    end
+
+    local groupDungeonQuests = {}
+    for _, d in ipairs(GROUP_DUNGEON_QUESTS) do
+        groupDungeonQuests[d.key] = {
+            name     = GetZoneNameById(d.id),
+            zoneName = GetZoneNameById(ZONE_IDS[d.zone]),
+            earned   = QuestDone(d.quest) and 1 or 0,
+            total    = 1,
+        }
+    end
+
+    local publicDungeonBosses = {}
+    for _, d in ipairs(PUBLIC_DUNGEON_BOSSES) do
+        publicDungeonBosses[d.key] = {
+            name     = GetZoneNameById(d.id),
+            zoneName = GetZoneNameById(ZONE_IDS[d.zone]),
+            earned   = IsAchievementComplete(d.achievement) and 1 or 0,
+            total    = 1,
+        }
+    end
+
+    return {
+        general = {
+            level           = { earned = LevelSkillPoints(level), total = LevelSkillPoints(LEVEL_CAP) },
+            mainQuest       = { earned = mainQuestEarned, total = #MAIN_QUEST_IDS },
+            tutorial        = { earned = tutorialDone and 1 or 0, total = 1 },
+            allianceWarRank = { earned = GetUnitAvARank("player") or 0, total = 50 },
+            maelstromArena  = { earned = IsAchievementComplete(MAELSTROM_ARENA_ACHIEVEMENT_ID) and 1 or 0, total = 1 },
+            infiniteArchive = { earned = QuestDone(INFINITE_ARCHIVE_QUEST_ID) and 1 or 0, total = 1 },
+            -- No reliable API for "has Folium Discognitum" -- USPF infers it from
+            -- spare unspent skill points via internal skill-manager globals not
+            -- confirmed present in this game version's public API doc. Exposing
+            -- just the underlying quest signal instead of guessing; total is 2
+            -- points once you have it (see USPF's FolDis for the full heuristic
+            -- if this needs to become earned/not-earned later).
+            foliumDiscognitumQuestDone = QuestDone(FOLIUM_DISCOGNITUM_QUEST_ID),
+        },
+        zoneQuests         = zoneQuests,
+        skyshards          = skyshards,
+        groupDungeonQuests = groupDungeonQuests,
+        publicDungeonBosses = publicDungeonBosses,
+    }
 end
 
 local function ReadCharData()
@@ -530,6 +680,7 @@ local function ReadCharData()
         bio = {
             name           = GetUnitName("player"),
             account        = GetDisplayName(),
+            server         = GetMegaserver(),
             class          = GetUnitClass("player"),
             race           = GetUnitRace("player"),
             alliance       = GetAllianceName(alliance),
@@ -555,16 +706,10 @@ local function ReadCharData()
             spellResist    = GetPlayerStat(STAT_SPELL_RESIST,        STAT_BONUS_OPTION_APPLY_BONUS),
             critResist     = GetPlayerStat(STAT_CRITICAL_RESISTANCE, STAT_BONUS_OPTION_APPLY_BONUS),
         },
-        -- nextTrainableTime is an absolute GetTimeStamp() (== now if already
-        -- trainable) rather than just the horseTrainingDone boolean below, so
-        -- a companion addon can compute "when is this character's riding
-        -- training ready" for characters other than the one currently logged
-        -- in, the same way research.nextCompletionTime works.
         mount = {
-            speed             = speedBonus,
-            stamina           = stamBonus,
-            capacity          = invBonus,
-            nextTrainableTime = GetTimeStamp() + GetTimeUntilCanBeTrained(),
+            speed    = speedBonus,
+            stamina  = stamBonus,
+            capacity = invBonus,
         },
         -- On-person only (carried by this character). Gold uses ESO's dedicated
         -- money function; the rest go through GetCarriedCurrencyAmount.
@@ -595,22 +740,17 @@ local function ReadCharData()
             soulsEmpty  = soulsEmpty,
             soulsFilled = soulsFilled,
         },
-        skills       = ReadSkillLines(),
-        champion     = ReadChampionData(),
-        research     = ReadResearchData(),
-        inventory    = items,
-        equippedGear = ReadWornGear(),
+        skills            = ReadSkillLines(),
+        champion          = ReadChampionData(),
+        inventory         = items,
+        equippedGear      = ReadWornGear(),
+        skillPointSources = ReadSkillPointSources(),
         -- IsActivityEligibleForDailyReward is server-authoritative, so unlike
         -- the writ check it's correct no matter when in the session this runs
         -- (even if the dungeon was completed in an earlier session today).
-        -- GetTimeUntilCanBeTrained() is similarly live/authoritative -- riding
-        -- training is a rolling cooldown (~20-24h from last train), not tied to
-        -- the 10:00 UTC reset boundary, so a nonzero value directly means
-        -- "already trained, still on cooldown" with no extra bookkeeping needed.
         dailies = {
             dungeonDone       = not IsActivityEligibleForDailyReward(LFG_ACTIVITY_DUNGEON),
             writsDone         = ReadDailyWritStatus(charName),
-            horseTrainingDone = (GetTimeUntilCanBeTrained()) > 0,
             remainsSilentDone = ReadRemainsSilentStatus(charName),
             pledgesCompleted  = ReadPledgeStatus(charName),
         },
@@ -735,10 +875,10 @@ end
 local function Snapshot()
     local charName = GetUnitName("player")
     -- __dailyTracking__ lives outside the builds table but Snapshot() below
-    -- replaces WornGearSV[charName] wholesale, so it has to be carried over
+    -- replaces ESOHelperSV[charName] wholesale, so it has to be carried over
     -- explicitly rather than just left alone. Double-underscore name keeps
     -- it out of the armory builds list, same convention as __char__.
-    local prevDailyTracking = WornGearSV[charName] and WornGearSV[charName].__dailyTracking__
+    local prevDailyTracking = ESOHelperSV[charName] and ESOHelperSV[charName].__dailyTracking__
     local builds = {}
     local count = 0
 
@@ -746,7 +886,7 @@ local function Snapshot()
         local buildName = GetArmoryBuildName(i)
         if buildName and buildName ~= "" then
             count = count + 1
-            local prevData       = WornGearSV[charName] and WornGearSV[charName][buildName]
+            local prevData       = ESOHelperSV[charName] and ESOHelperSV[charName][buildName]
             local prevSkills     = prevData and prevData.skills     or nil
             local prevCp         = prevData and prevData.cp         or nil
             local prevSubclasses = prevData and prevData.subclasses or nil
@@ -775,7 +915,7 @@ local function Snapshot()
         if next(liveCp) then
             builds[activeBuild].cp = liveCp
         end
-        d("WornGear: captured skills + CP stars for " .. activeBuild)
+        d("ESO Helper: captured skills + CP stars for " .. activeBuild)
     end
 
     if activeBuild then
@@ -814,14 +954,30 @@ local function Snapshot()
     -- Capture full character data (bio, stats, skills, inventory, etc.)
     builds["__char__"] = ReadCharData()
 
-    WornGearSV[charName] = builds
-    WornGearSV[charName].__dailyTracking__ = prevDailyTracking or { lastWritCompleted = 0 }
-    d("WornGear: saved " .. count .. " armory builds for " .. charName)
+    ESOHelperSV[charName] = builds
+    ESOHelperSV[charName].__dailyTracking__ = prevDailyTracking or { lastWritCompleted = 0 }
+    d("ESO Helper: saved " .. count .. " armory builds for " .. charName)
 
-    -- Achievements are account-wide, so keyed by account handle, not charName --
-    -- see WornGearAchievementsSV declaration up top.
-    WornGearAchievementsSV[GetDisplayName()] = ReadAchievements()
-    WornGearSetCollectionsSV[GetDisplayName()] = ReadSetCollections()
+    -- Achievements are account-wide, so keyed by account handle then by
+    -- megaserver, not charName -- see ESOHelperAchievementsSV declaration up top.
+    -- If this account entry is still the old pre-fix flat shape (its own
+    -- 'earnedPoints'/'sets' key sitting where a server key now goes), reset
+    -- it first -- otherwise the stale flat keys would sit right alongside
+    -- the new nested one and the desktop app's old-shape fallback (which
+    -- only checks for those same keys) would keep reading the stale data
+    -- and never notice the fresh nested snapshot.
+    local account = GetDisplayName()
+    local server = GetMegaserver()
+    if ESOHelperAchievementsSV[account] and ESOHelperAchievementsSV[account].earnedPoints then
+        ESOHelperAchievementsSV[account] = {}
+    end
+    ESOHelperAchievementsSV[account] = ESOHelperAchievementsSV[account] or {}
+    ESOHelperAchievementsSV[account][server] = ReadAchievements()
+    if ESOHelperSetCollectionsSV[account] and ESOHelperSetCollectionsSV[account].sets then
+        ESOHelperSetCollectionsSV[account] = {}
+    end
+    ESOHelperSetCollectionsSV[account] = ESOHelperSetCollectionsSV[account] or {}
+    ESOHelperSetCollectionsSV[account][server] = ReadSetCollections()
 end
 
 -- EVENT_PLAYER_ACTIVATED fires after every loading screen (zone changes, dungeon
@@ -829,13 +985,13 @@ end
 -- first time per session; EVENT_ARMORY_BUILD_RESTORE_RESPONSE handles updates
 -- when a build is actually swapped mid-session.
 local hasSnapshotted = false
-EVENT_MANAGER:RegisterForEvent("WornGear", EVENT_PLAYER_ACTIVATED, function()
+EVENT_MANAGER:RegisterForEvent("ESOHelper", EVENT_PLAYER_ACTIVATED, function()
     if hasSnapshotted then return end
     hasSnapshotted = true
     zo_callLater(Snapshot, 3000)
 end)
 
-EVENT_MANAGER:RegisterForEvent("WornGear_Restore", EVENT_ARMORY_BUILD_RESTORE_RESPONSE, function(_, result, _)
+EVENT_MANAGER:RegisterForEvent("ESOHelper_Restore", EVENT_ARMORY_BUILD_RESTORE_RESPONSE, function(_, result, _)
     if result == ARMORY_BUILD_RESTORE_RESULT_SUCCESS then
         zo_callLater(Snapshot, 1500)
     end
@@ -848,31 +1004,31 @@ end)
 -- the app actually reads, and it otherwise wouldn't update until the next
 -- full Snapshot(). Filtered to QUEST_TYPE_CRAFTING since EVENT_QUEST_COMPLETE
 -- fires for every quest type, not just writs.
-EVENT_MANAGER:RegisterForEvent("WornGear_WritComplete", EVENT_QUEST_COMPLETE, function(_, questName, level, prevXp, curXp, cp, questType)
+EVENT_MANAGER:RegisterForEvent("ESOHelper_WritComplete", EVENT_QUEST_COMPLETE, function(_, questName, level, prevXp, curXp, cp, questType)
     if questType ~= QUEST_TYPE_CRAFTING then return end
     local charName = GetUnitName("player")
-    WornGearSV[charName] = WornGearSV[charName] or {}
-    WornGearSV[charName].__dailyTracking__ = WornGearSV[charName].__dailyTracking__ or {}
-    WornGearSV[charName].__dailyTracking__.lastWritCompleted = GetTimeStamp()
+    ESOHelperSV[charName] = ESOHelperSV[charName] or {}
+    ESOHelperSV[charName].__dailyTracking__ = ESOHelperSV[charName].__dailyTracking__ or {}
+    ESOHelperSV[charName].__dailyTracking__.lastWritCompleted = GetTimeStamp()
 
-    local char = WornGearSV[charName].__char__
+    local char = ESOHelperSV[charName].__char__
     if char then
         char.dailies = char.dailies or {}
         char.dailies.writsDone = true
     end
-    d("WornGear: writ completion recorded for " .. charName)
+    d("ESO Helper: writ completion recorded for " .. charName)
 end)
 
 -- Recorded live for the same reason as the writ handler above. Uses a set of
 -- quest names rather than a count so a repeat completion of the same pledge
 -- (e.g. abandoning and re-accepting) doesn't double count -- see
 -- ReadPledgeStatus above for why names aren't hardcoded ahead of time.
-EVENT_MANAGER:RegisterForEvent("WornGear_PledgeComplete", EVENT_QUEST_COMPLETE, function(_, questName, level, prevXp, curXp, cp, questType)
+EVENT_MANAGER:RegisterForEvent("ESOHelper_PledgeComplete", EVENT_QUEST_COMPLETE, function(_, questName, level, prevXp, curXp, cp, questType)
     if questType ~= QUEST_TYPE_UNDAUNTED_PLEDGE then return end
     local charName = GetUnitName("player")
-    WornGearSV[charName] = WornGearSV[charName] or {}
-    WornGearSV[charName].__dailyTracking__ = WornGearSV[charName].__dailyTracking__ or {}
-    local tracking = WornGearSV[charName].__dailyTracking__
+    ESOHelperSV[charName] = ESOHelperSV[charName] or {}
+    ESOHelperSV[charName].__dailyTracking__ = ESOHelperSV[charName].__dailyTracking__ or {}
+    local tracking = ESOHelperSV[charName].__dailyTracking__
     if (tracking.pledgeNamesResetAt or 0) < GetLastDailyResetTimestamp() then
         tracking.pledgeNames = {}
         tracking.pledgeNamesResetAt = GetTimeStamp()
@@ -880,12 +1036,12 @@ EVENT_MANAGER:RegisterForEvent("WornGear_PledgeComplete", EVENT_QUEST_COMPLETE, 
     tracking.pledgeNames = tracking.pledgeNames or {}
     tracking.pledgeNames[questName] = true
 
-    local char = WornGearSV[charName].__char__
+    local char = ESOHelperSV[charName].__char__
     if char then
         char.dailies = char.dailies or {}
         char.dailies.pledgesCompleted = ReadPledgeStatus(charName)
     end
-    d("WornGear: pledge completion recorded for " .. charName .. " (" .. tostring(questName) .. ")")
+    d("ESO Helper: pledge completion recorded for " .. charName .. " (" .. tostring(questName) .. ")")
 end)
 
 -- Recorded live for the same reason as the writ handler above: without this,
@@ -893,19 +1049,19 @@ end)
 -- until the next Snapshot(). isSelf filters out loot other group members pick
 -- up that happens to share an item id (unlikely for this list, but cheap to
 -- check).
-EVENT_MANAGER:RegisterForEvent("WornGear_RemainsSilent", EVENT_LOOT_RECEIVED, function(_, receivedBy, itemName, quantity, soundCategory, lootType, isSelf, isPickpocketLoot, questItemIcon, itemId, isStolen)
+EVENT_MANAGER:RegisterForEvent("ESOHelper_RemainsSilent", EVENT_LOOT_RECEIVED, function(_, receivedBy, itemName, quantity, soundCategory, lootType, isSelf, isPickpocketLoot, questItemIcon, itemId, isStolen)
     if not isSelf or not _REMAINS_SILENT_ITEM_IDS[itemId] then return end
     local charName = GetUnitName("player")
-    WornGearSV[charName] = WornGearSV[charName] or {}
-    WornGearSV[charName].__dailyTracking__ = WornGearSV[charName].__dailyTracking__ or {}
-    WornGearSV[charName].__dailyTracking__.lastRemainsSilentGift = GetTimeStamp()
+    ESOHelperSV[charName] = ESOHelperSV[charName] or {}
+    ESOHelperSV[charName].__dailyTracking__ = ESOHelperSV[charName].__dailyTracking__ or {}
+    ESOHelperSV[charName].__dailyTracking__.lastRemainsSilentGift = GetTimeStamp()
 
-    local char = WornGearSV[charName].__char__
+    local char = ESOHelperSV[charName].__char__
     if char then
         char.dailies = char.dailies or {}
         char.dailies.remainsSilentDone = true
     end
-    d("WornGear: Remains-Silent gift recorded for " .. charName)
+    d("ESO Helper: Remains-Silent gift recorded for " .. charName)
 end)
 
 -- Snapshot() only runs once per session (see hasSnapshotted above), so without
@@ -915,72 +1071,10 @@ end)
 -- field in place rather than re-running the full Snapshot().
 local function RefreshDungeonDaily()
     local charName = GetUnitName("player")
-    local char = WornGearSV[charName] and WornGearSV[charName].__char__
+    local char = ESOHelperSV[charName] and ESOHelperSV[charName].__char__
     if not char then return end
     char.dailies = char.dailies or {}
     char.dailies.dungeonDone = not IsActivityEligibleForDailyReward(LFG_ACTIVITY_DUNGEON)
 end
-EVENT_MANAGER:RegisterForEvent("WornGear_DungeonComplete", EVENT_ACTIVITY_FINDER_ACTIVITY_COMPLETE, RefreshDungeonDaily)
-EVENT_MANAGER:RegisterForEvent("WornGear_DungeonCooldown", EVENT_ACTIVITY_FINDER_COOLDOWNS_UPDATE, RefreshDungeonDaily)
-
--- Research state only changes via these 3 events (start/cancel/complete), so
--- rather than waiting for the once-per-session Snapshot(), patch __char__.research
--- in place right when one fires -- same reasoning as RefreshDungeonDaily above.
-local function RefreshResearch()
-    local charName = GetUnitName("player")
-    local char = WornGearSV[charName] and WornGearSV[charName].__char__
-    if not char then return end
-    char.research = ReadResearchData()
-end
-EVENT_MANAGER:RegisterForEvent("WornGear_ResearchStarted",   EVENT_SMITHING_TRAIT_RESEARCH_STARTED,   RefreshResearch)
-EVENT_MANAGER:RegisterForEvent("WornGear_ResearchCanceled",  EVENT_SMITHING_TRAIT_RESEARCH_CANCELED,  RefreshResearch)
-EVENT_MANAGER:RegisterForEvent("WornGear_ResearchCompleted", EVENT_SMITHING_TRAIT_RESEARCH_COMPLETED, RefreshResearch)
-
--- Same reasoning as RefreshDungeonDaily: Snapshot() only runs once per session,
--- so without this a training done right after login wouldn't show as done
--- until the next session.
-local function RefreshHorseTraining()
-    local charName = GetUnitName("player")
-    local char = WornGearSV[charName] and WornGearSV[charName].__char__
-    if not char then return end
-    char.dailies = char.dailies or {}
-    char.dailies.horseTrainingDone = true
-end
-EVENT_MANAGER:RegisterForEvent("WornGear_HorseTrained", EVENT_RIDING_SKILL_IMPROVEMENT, RefreshHorseTraining)
-
--- ── Cross-character alerts ───────────────────────────────────────────────────
--- research.nextCompletionTime is already collected for every character (see
--- ReadResearchData above), account-wide -- so this can tell you a *different*
--- character's research just finished without you ever having to log into it.
--- See CLAUDE.md's "one deliberate exception" note for why this lives here
--- rather than in the desktop app: it only matters if seen right when it
--- happens, and that's the game screen, not the second monitor.
---
--- Fires once per distinct completion -- _alerted remembers the exact target
--- timestamp already alerted for per character+field, so this doesn't repeat
--- every scan tick, only when a *new* completion (a different timestamp) shows
--- up after that character logs in and starts fresh research/training.
-local ALERT_SCAN_INTERVAL_MS = 30000
-local _alerted = {}
-
-local function MaybeAlert(charName, alertField, target, message)
-    if not target or target <= 0 then return end
-    local now = GetTimeStamp()
-    if target > now then return end
-    _alerted[charName] = _alerted[charName] or {}
-    if _alerted[charName][alertField] == target then return end
-    _alerted[charName][alertField] = target
-    d("WornGear: " .. message)
-    ZO_Alert(UI_ALERT_CATEGORY_ALERT, nil, message)
-end
-
-local function ScanForAlerts()
-    for charName, block in pairs(WornGearSV) do
-        local char = type(block) == "table" and block.__char__
-        if char and char.research then
-            MaybeAlert(charName, "research", char.research.nextCompletionTime,
-                charName .. "'s crafting research is complete!")
-        end
-    end
-end
-EVENT_MANAGER:RegisterForUpdate("WornGear_Alerts", ALERT_SCAN_INTERVAL_MS, ScanForAlerts)
+EVENT_MANAGER:RegisterForEvent("ESOHelper_DungeonComplete", EVENT_ACTIVITY_FINDER_ACTIVITY_COMPLETE, RefreshDungeonDaily)
+EVENT_MANAGER:RegisterForEvent("ESOHelper_DungeonCooldown", EVENT_ACTIVITY_FINDER_COOLDOWNS_UPDATE, RefreshDungeonDaily)
