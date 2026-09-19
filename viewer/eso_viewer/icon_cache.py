@@ -1,5 +1,6 @@
 """Async skill icon fetching with disk + memory cache."""
 import hashlib
+from pathlib import Path
 
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QPixmap
