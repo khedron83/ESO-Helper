@@ -50,9 +50,12 @@ _SYNC_FILES = ['ESOHelper.lua']
 # Where ESOHelper.lua lives on this machine, and (in "Sync Server" mode) the
 # sync server's address -- see eso_viewer/sync/config.py for the actual
 # ~/.config/eso-helper/sync.json load/save (shared with settings_dialog.py,
-# which is what now lets server_url/server_token be set from the UI instead
-# of only by hand-editing the file). remote_dir is still hand-edit-only, kept
-# out of the UI since it's a private local filesystem path:
+# which is what lets remote_dir/server_url/server_token all be set from the
+# UI instead of hand-editing the file -- remote_dir used to be hand-edit-only,
+# fine on zeus but a dead end for anyone else on "This PC" mode who doesn't
+# know the file exists; settings_dialog.py now has a "SavedVariables
+# directory" field with Browse.../Auto-detect, backed by eso_viewer.paths.
+# detect_saved_vars_dir()):
 #   {"remote_dir": "/path/to/.../SavedVariables"}
 # "This PC" mode (see settings_dialog.py) reads remote_dir straight off local
 # disk (not scp -- there's no other-machine SSH option anymore).

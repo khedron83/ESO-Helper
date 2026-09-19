@@ -1,8 +1,11 @@
+from pathlib import Path
+
 from PySide6.QtCore import QSettings, Qt
 from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
     QDialogButtonBox,
+    QFileDialog,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -16,12 +19,14 @@ from PySide6.QtWidgets import (
 )
 
 from eso_viewer import dailies
+from eso_viewer.paths import detect_saved_vars_dir
 from eso_viewer.sync import config as sync_config
 
 # Distinct accent per group: QGroupBox::title selector only, so it doesn't
 # cascade into child widgets.
 _SYNC_ACCENT = "#60a5fa"
 _DAILIES_ACCENT = "#f97316"
+_ERROR_COLOR = "#f87171"
 
 
 def _accent_group_box_style(accent: str) -> str:
@@ -75,6 +80,33 @@ class SettingsDialog(QDialog):
         self._this_pc_radio.toggled.connect(self._update_server_fields_enabled)
         self._server_radio.toggled.connect(self._update_server_fields_enabled)
         sync_layout.addWidget(self._this_pc_radio)
+
+        # remote_dir (~/.config/eso-helper/sync.json) used to be hand-edit-only
+        # -- fine on zeus (this machine, set up by hand once) but a dead end
+        # for anyone else running "This PC" mode without editing a config file
+        # they don't know exists. Auto-detect gives a first guess (same
+        # Proton-prefix/native-path logic addon_manager's own Settings dialog
+        # already uses for AddOns/SavedVariables); Browse... covers whatever
+        # it misses -- non-Steam installs, a moved Documents folder, etc.
+        remote_dir_row = QHBoxLayout()
+        remote_dir_row.setContentsMargins(20, 0, 0, 4)
+        self._remote_dir_edit = QLineEdit()
+        self._remote_dir_edit.setPlaceholderText("Path to SavedVariables folder (where ESOHelper.lua is written)…")
+        self._remote_dir_edit.textChanged.connect(self._validate_remote_dir)
+        remote_dir_browse_btn = QPushButton("Browse…")
+        remote_dir_browse_btn.clicked.connect(self._browse_remote_dir)
+        remote_dir_detect_btn = QPushButton("Auto-detect")
+        remote_dir_detect_btn.clicked.connect(self._auto_detect_remote_dir)
+        remote_dir_row.addWidget(self._remote_dir_edit)
+        remote_dir_row.addWidget(remote_dir_browse_btn)
+        remote_dir_row.addWidget(remote_dir_detect_btn)
+        sync_layout.addLayout(remote_dir_row)
+
+        self._remote_dir_warning = QLabel("This path doesn't exist.")
+        self._remote_dir_warning.setStyleSheet(f"color: {_ERROR_COLOR}; font-size: 11px; margin-left: 20px;")
+        self._remote_dir_warning.hide()
+        sync_layout.addWidget(self._remote_dir_warning)
+
         sync_layout.addWidget(self._server_radio)
 
         note = QLabel(
@@ -125,6 +157,25 @@ class SettingsDialog(QDialog):
         )
         self._server_url_edit.setEnabled(needs_server)
         self._server_token_edit.setEnabled(needs_server)
+        self._remote_dir_edit.setEnabled(self._this_pc_radio.isChecked())
+
+    def _validate_remote_dir(self):
+        text = self._remote_dir_edit.text().strip()
+        invalid = bool(text) and not Path(text).is_dir()
+        self._remote_dir_edit.setStyleSheet(f"border: 1px solid {_ERROR_COLOR};" if invalid else "")
+        self._remote_dir_warning.setVisible(invalid)
+
+    def _browse_remote_dir(self):
+        path = QFileDialog.getExistingDirectory(self, "Select SavedVariables Directory", self._remote_dir_edit.text())
+        if path:
+            self._remote_dir_edit.setText(path)
+
+    def _auto_detect_remote_dir(self):
+        detected = detect_saved_vars_dir()
+        if detected:
+            self._remote_dir_edit.setText(str(detected))
+        else:
+            self._remote_dir_edit.setPlaceholderText("Could not auto-detect — please browse manually")
 
     def _build_dailies_group(self) -> QGroupBox:
         group = QGroupBox("Untracked Dailies")
@@ -201,6 +252,8 @@ class SettingsDialog(QDialog):
         cfg = sync_config.load()
         self._server_url_edit.setText(cfg.get("server_url", ""))
         self._server_token_edit.setText(cfg.get("server_token", ""))
+        self._remote_dir_edit.setText(cfg.get("remote_dir", ""))
+        self._validate_remote_dir()
 
     def _save_and_accept(self):
         s = QSettings()
@@ -210,5 +263,6 @@ class SettingsDialog(QDialog):
         sync_config.save({
             "server_url": self._server_url_edit.text().strip(),
             "server_token": self._server_token_edit.text().strip(),
+            "remote_dir": self._remote_dir_edit.text().strip(),
         })
         self.accept()
